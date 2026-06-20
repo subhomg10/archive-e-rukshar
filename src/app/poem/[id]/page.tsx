@@ -138,7 +138,7 @@ export default function PoemPage() {
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      <main className="max-w-4xl mx-auto px-6 py-20 md:py-32">
+      <main className="max-w-6xl mx-auto px-6 py-20 md:py-32">
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -185,7 +185,7 @@ export default function PoemPage() {
 
             <TabsContent value="roman">
               <article className="reading-container">
-                <div className="font-headline text-2xl md:text-3xl leading-[1.8] md:leading-[2] whitespace-pre-line text-foreground/90 font-medium text-center">
+                <div className="font-headline text-xl md:text-2xl leading-[1.8] md:leading-[2] whitespace-pre-line text-foreground/90 font-medium text-center">
                   {poem.roman}
                 </div>
               </article>
@@ -194,7 +194,7 @@ export default function PoemPage() {
             {poem.hindi && (
               <TabsContent value="hindi">
                 <article className="reading-container">
-                  <div className="font-headline text-2xl md:text-3xl leading-[1.8] md:leading-[2] whitespace-pre-line text-foreground/90 font-medium text-center">
+                  <div className="font-headline text-xl md:text-2xl leading-[1.8] md:leading-[2] whitespace-pre-line text-foreground/90 font-medium text-center">
                     {poem.hindi}
                   </div>
                 </article>
@@ -204,7 +204,7 @@ export default function PoemPage() {
             {poem.urdu && (
               <TabsContent value="urdu">
                 <article className="reading-container">
-                  <div className="font-headline text-2xl md:text-3xl leading-[1.8] md:leading-[2] whitespace-pre-line text-foreground/90 font-medium text-center dir-rtl">
+                  <div className="font-headline text-xl md:text-2xl leading-[1.8] md:leading-[2] whitespace-pre-line text-foreground/90 font-medium text-center dir-rtl">
                     {poem.urdu}
                   </div>
                 </article>
