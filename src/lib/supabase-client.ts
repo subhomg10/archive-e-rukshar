@@ -73,21 +73,18 @@ export const fetchFeaturedPoems = async (): Promise<Poem[]> => {
 
 /**
  * Reviews fetching and submission
+ * Updated to use 'reviews' table as suggested by the database schema hint.
  */
 export const fetchReviews = async (poemId: string): Promise<Review[]> => {
   try {
     const { data, error, status } = await supabase
-      .from('poem_reviews')
+      .from('reviews')
       .select('*')
       .eq('poem_id', poemId)
       .order('created_at', { ascending: false });
 
     if (error) {
-      if (status === 404) {
-        console.warn("Table 'poem_reviews' not found.");
-      } else {
-        console.error("fetchReviews Error:", error.message, error.hint || '');
-      }
+      console.error("fetchReviews Error:", error.message, error.hint || '');
       return [];
     }
     return (data || []) as Review[];
@@ -99,7 +96,7 @@ export const fetchReviews = async (poemId: string): Promise<Review[]> => {
 
 export const addReview = async (review: Omit<Review, 'id' | 'created_at'>) => {
   const { error } = await supabase
-    .from('poem_reviews')
+    .from('reviews')
     .insert([review]);
 
   if (error) {
