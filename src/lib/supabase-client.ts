@@ -5,14 +5,12 @@ import { Poem } from './types';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn("Supabase credentials missing. Check your .env file.");
-}
+console.log("Supabase Client Initializing with URL:", supabaseUrl);
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export const fetchPoems = async (filter?: { theme?: string; search?: string }): Promise<Poem[]> => {
-  console.log("Supabase Diagnostic: Fetching all poems...", { filter });
+  console.log("Supabase Diagnostic: Attempting to fetch all poems from 'poems' table...");
   
   let query = supabase.from('poems').select('*');
 
@@ -25,15 +23,20 @@ export const fetchPoems = async (filter?: { theme?: string; search?: string }): 
     query = query.or(`title.ilike.%${s}%,theme.ilike.%${s}%,emotional_engine.ilike.%${s}%,roman.ilike.%${s}%,description.ilike.%${s}%`);
   }
 
-  const { data, error } = await query.order('date', { ascending: false });
+  const response = await query.order('date', { ascending: false });
   
-  if (error) {
-    console.error("Supabase Diagnostic Error (fetchPoems):", error);
-    throw new Error(`Supabase Error (${error.code}): ${error.message}`);
+  console.log("--- RAW SUPABASE RESPONSE (fetchPoems) ---");
+  console.log("Data:", response.data);
+  console.log("Error:", response.error);
+  console.log("Status:", response.status);
+  console.log("StatusText:", response.statusText);
+  console.log("------------------------------------------");
+
+  if (response.error) {
+    throw new Error(`Supabase Error [${response.error.code}]: ${response.error.message}`);
   }
   
-  console.log(`Supabase Diagnostic: Successfully fetched ${data?.length || 0} poems.`);
-  return (data || []) as Poem[];
+  return (response.data || []) as Poem[];
 };
 
 export const fetchPoemById = async (id: string): Promise<Poem | null> => {
@@ -44,7 +47,7 @@ export const fetchPoemById = async (id: string): Promise<Poem | null> => {
     .single();
 
   if (error) {
-    console.error(`Supabase Diagnostic Error (fetchPoemById ${id}):`, error.message);
+    console.error(`Supabase Error (fetchPoemById ${id}):`, error.message);
     return null;
   }
   
@@ -52,32 +55,35 @@ export const fetchPoemById = async (id: string): Promise<Poem | null> => {
 };
 
 export const fetchThemes = async (): Promise<string[]> => {
-  const { data, error } = await supabase
+  const response = await supabase
     .from('poems')
     .select('theme');
 
-  if (error) {
-    console.error('Supabase Diagnostic Error (fetchThemes):', error.message);
+  if (response.error) {
+    console.error('Supabase Error (fetchThemes):', response.error.message);
     return [];
   }
   
-  const themes = Array.from(new Set(data.map(i => i.theme))).filter(Boolean) as string[];
+  const themes = Array.from(new Set(response.data.map(i => i.theme))).filter(Boolean) as string[];
   return themes;
 };
 
 export const fetchFeaturedPoems = async (): Promise<Poem[]> => {
-  console.log("Supabase Diagnostic: Fetching featured poems...");
-  const { data, error } = await supabase
+  console.log("Supabase Diagnostic: Attempting to fetch featured poems (featured=true)...");
+  const response = await supabase
     .from('poems')
     .select('*')
     .eq('featured', true)
     .order('date', { ascending: false });
 
-  if (error) {
-    console.error('Supabase Diagnostic Error (fetchFeaturedPoems):', error);
-    throw new Error(`Supabase Error (${error.code}): ${error.message}`);
+  console.log("--- RAW SUPABASE RESPONSE (fetchFeaturedPoems) ---");
+  console.log("Data:", response.data);
+  console.log("Error:", response.error);
+  console.log("-------------------------------------------------");
+
+  if (response.error) {
+    throw new Error(`Supabase Error [${response.error.code}]: ${response.error.message}`);
   }
   
-  console.log(`Supabase Diagnostic: Successfully fetched ${data?.length || 0} featured poems.`);
-  return (data || []) as Poem[];
+  return (response.data || []) as Poem[];
 };
