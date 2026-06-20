@@ -41,6 +41,7 @@ export function PoemClient({ initialPoem: poem }: PoemClientProps) {
 
   useEffect(() => {
     const loadReviews = async () => {
+      setLoadingReviews(true);
       try {
         const reviewData = await fetchReviews(poem.id);
         setReviews(reviewData || []);
@@ -191,7 +192,6 @@ export function PoemClient({ initialPoem: poem }: PoemClientProps) {
           {/* About this Fragment Section */}
           <section className="space-y-4 md:space-y-6 max-w-2xl mx-auto px-2">
             <div className="flex items-center space-x-3 text-primary/70">
-              <Info className="w-4 h-4" />
               <h3 className="text-[10px] md:text-xs uppercase tracking-[0.2em] font-medium">About this Fragment</h3>
             </div>
             <div className="space-y-4">

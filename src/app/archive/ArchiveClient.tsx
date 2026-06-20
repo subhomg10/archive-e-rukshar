@@ -36,7 +36,8 @@ export default function ArchiveClient() {
         setFeaturedPoems(featuredData);
         setPoems(allData);
       } catch (err: any) {
-        setError(err.message);
+        setError("The Archive is currently unreachable. Please verify your connection or try again later.");
+        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -51,7 +52,7 @@ export default function ArchiveClient() {
       <main className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12 space-y-12 md:space-y-16">
         
         {error && (
-          <Alert variant="destructive" className="border-destructive/20 bg-destructive/5">
+          <Alert variant="destructive" className="border-destructive/20 bg-destructive/5 max-w-2xl mx-auto">
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>Archive Error</AlertTitle>
             <AlertDescription>{error}</AlertDescription>
@@ -59,7 +60,7 @@ export default function ArchiveClient() {
         )}
 
         {/* Featured Section */}
-        {featuredPoems.length > 0 && (
+        {!loading && featuredPoems.length > 0 && !error && (
           <section className="space-y-6 md:space-y-8">
             <header className="space-y-2">
               <h2 className="font-headline text-2xl md:text-4xl flex items-center gap-3 text-primary">
@@ -77,7 +78,7 @@ export default function ArchiveClient() {
           </section>
         )}
 
-        <Separator className="bg-border/30" />
+        {!error && <Separator className="bg-border/30" />}
 
         {/* Search & Filters Section */}
         <section className="space-y-8 md:space-y-10">
@@ -124,9 +125,11 @@ export default function ArchiveClient() {
           <div className="space-y-6 md:space-y-8">
             <header className="flex items-end justify-between gap-4">
               <h2 className="font-headline text-2xl md:text-4xl">All Verses</h2>
-              <span className="text-[10px] text-muted-foreground tracking-widest uppercase font-light shrink-0">
-                {poems.length} {poems.length === 1 ? 'Fragment' : 'Fragments'}
-              </span>
+              {!loading && (
+                <span className="text-[10px] text-muted-foreground tracking-widest uppercase font-light shrink-0">
+                  {poems.length} {poems.length === 1 ? 'Fragment' : 'Fragments'}
+                </span>
+              )}
             </header>
 
             {loading ? (
@@ -134,7 +137,7 @@ export default function ArchiveClient() {
                 <Loader2 className="w-6 h-6 md:w-8 md:h-8 animate-spin text-primary/40" />
                 <p className="text-[10px] text-muted-foreground tracking-[0.2em] uppercase">Consulting the Archive</p>
               </div>
-            ) : (
+            ) : !error ? (
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                   <AnimatePresence mode="popLayout">
@@ -144,7 +147,7 @@ export default function ArchiveClient() {
                   </AnimatePresence>
                 </div>
 
-                {!loading && poems.length === 0 && (
+                {poems.length === 0 && (
                   <motion.div 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -166,7 +169,7 @@ export default function ArchiveClient() {
                   </motion.div>
                 )}
               </>
-            )}
+            ) : null}
           </div>
         </section>
       </main>

@@ -4,8 +4,9 @@ import { useState, useEffect } from 'react';
 import { Navigation } from '@/components/Navigation';
 import { ArchiveStats } from '@/components/ArchiveStats';
 import { fetchArchiveStats } from '@/lib/supabase-client';
-import { Loader2 } from 'lucide-react';
+import { Loader2, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
 export default function StatisticsClient() {
   const [stats, setStats] = useState({
@@ -15,14 +16,17 @@ export default function StatisticsClient() {
     totalReviews: 0
   });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadStats = async () => {
       setLoading(true);
+      setError(null);
       try {
         const statsData = await fetchArchiveStats();
         setStats(statsData);
       } catch (err) {
+        setError("Unable to calculate archive statistics at this time.");
         console.error("Error loading stats:", err);
       } finally {
         setLoading(false);
@@ -47,12 +51,20 @@ export default function StatisticsClient() {
             <p className="text-primary tracking-[0.2em] uppercase text-[10px] md:text-xs font-light">Measuring the weight of words</p>
           </header>
 
+          {error && (
+            <Alert variant="destructive" className="max-w-md mx-auto border-destructive/20 bg-destructive/5">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Stats Unavailable</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20 md:py-32 space-y-4">
               <Loader2 className="w-6 h-6 md:w-8 md:h-8 animate-spin text-primary/40" />
               <p className="text-[10px] text-muted-foreground tracking-[0.2em] uppercase">Calculating resonance...</p>
             </div>
-          ) : (
+          ) : !error ? (
             <section className="space-y-10 md:space-y-12">
               <ArchiveStats stats={stats} />
               
@@ -62,7 +74,7 @@ export default function StatisticsClient() {
                 </p>
               </div>
             </section>
-          )}
+          ) : null}
         </motion.div>
       </main>
 
