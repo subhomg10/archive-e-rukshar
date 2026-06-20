@@ -40,14 +40,19 @@ export default function PoemPage() {
 
   useEffect(() => {
     const loadData = async () => {
-      const [poemData, reviewData] = await Promise.all([
-        fetchPoemById(id as string),
-        fetchReviews(id as string)
-      ]);
-      setPoem(poemData);
-      setReviews(reviewData);
-      setLoading(false);
-      setLoadingReviews(false);
+      try {
+        const [poemData, reviewData] = await Promise.all([
+          fetchPoemById(id as string),
+          fetchReviews(id as string)
+        ]);
+        setPoem(poemData);
+        setReviews(reviewData || []);
+      } catch (err) {
+        console.error("Error loading poem page data:", err);
+      } finally {
+        setLoading(false);
+        setLoadingReviews(false);
+      }
     };
     loadData();
   }, [id]);
@@ -95,11 +100,11 @@ export default function PoemPage() {
         title: "Reflection saved",
         description: "Your voice has been added to the archive."
       });
-    } catch (error) {
+    } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Submission failed",
-        description: "The ink did not set. Please try again."
+        description: error.message || "The ink did not set. Please try again."
       });
     } finally {
       setSubmittingReview(false);
@@ -156,7 +161,7 @@ export default function PoemPage() {
             <div className="flex items-center justify-center space-x-2 text-muted-foreground font-light italic">
               <span>by {poem.author}</span>
               <span className="mx-2 opacity-30">|</span>
-              <span>{format(new Date(poem.date), 'MMMM yyyy')}</span>
+              <span>{poem.date ? format(new Date(poem.date), 'MMMM yyyy') : 'Date Unknown'}</span>
             </div>
           </header>
 
@@ -371,7 +376,7 @@ export default function PoemPage() {
                               </div>
                             </div>
                             <time className="text-[10px] text-muted-foreground tracking-widest uppercase">
-                              {format(new Date(review.created_at), 'MMM d, yyyy')}
+                              {review.created_at ? format(new Date(review.created_at), 'MMM d, yyyy') : 'Recently'}
                             </time>
                           </CardHeader>
                           <CardContent className="p-6 pt-2">

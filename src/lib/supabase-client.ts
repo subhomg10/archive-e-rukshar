@@ -21,7 +21,7 @@ export const fetchPoems = async (filter?: { theme?: string; search?: string }): 
   const response = await query.order('date', { ascending: false });
   
   if (response.error) {
-    console.error("fetchPoems Error:", response.error);
+    console.error("fetchPoems Error:", response.error.message, response.error.hint);
     throw new Error(`Supabase Error [${response.error.code}]: ${response.error.message}`);
   }
   
@@ -64,6 +64,7 @@ export const fetchFeaturedPoems = async (): Promise<Poem[]> => {
     .order('date', { ascending: false });
 
   if (response.error) {
+    console.error("fetchFeaturedPoems Error:", response.error.message);
     throw new Error(`Supabase Error [${response.error.code}]: ${response.error.message}`);
   }
   
@@ -74,17 +75,26 @@ export const fetchFeaturedPoems = async (): Promise<Poem[]> => {
  * Reviews fetching and submission
  */
 export const fetchReviews = async (poemId: string): Promise<Review[]> => {
-  const { data, error } = await supabase
-    .from('poem_reviews')
-    .select('*')
-    .eq('poem_id', poemId)
-    .order('created_at', { ascending: false });
+  try {
+    const { data, error, status } = await supabase
+      .from('poem_reviews')
+      .select('*')
+      .eq('poem_id', poemId)
+      .order('created_at', { ascending: false });
 
-  if (error) {
-    console.error("fetchReviews Error:", error);
+    if (error) {
+      if (status === 404) {
+        console.warn("Table 'poem_reviews' not found. Reflections will be hidden until the table is created in Supabase.");
+      } else {
+        console.error("fetchReviews Error:", error.message, error.hint || '');
+      }
+      return [];
+    }
+    return (data || []) as Review[];
+  } catch (err) {
+    console.error("Unexpected error fetching reviews:", err);
     return [];
   }
-  return (data || []) as Review[];
 };
 
 export const addReview = async (review: Omit<Review, 'id' | 'created_at'>) => {
@@ -93,7 +103,7 @@ export const addReview = async (review: Omit<Review, 'id' | 'created_at'>) => {
     .insert([review]);
 
   if (error) {
-    console.error("addReview Error:", error);
-    throw error;
+    console.error("addReview Error:", error.message, error.hint || '');
+    throw new Error(error.message);
   }
 };
