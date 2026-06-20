@@ -16,7 +16,7 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { format, isValid } from 'date-fns';
+import { format, isValid, parseISO } from 'date-fns';
 
 export default function PoemPage() {
   const { id } = useParams();
@@ -113,8 +113,14 @@ export default function PoemPage() {
 
   const getFormattedDate = (dateStr: string | null | undefined) => {
     if (!dateStr) return 'Date Unknown';
-    const date = new Date(dateStr);
-    return isValid(date) ? format(date, 'MMMM yyyy') : 'Recently';
+    
+    // Attempt parsing as ISO first, then standard Date
+    let date = parseISO(dateStr);
+    if (!isValid(date)) {
+      date = new Date(dateStr);
+    }
+    
+    return isValid(date) ? format(date, 'MMMM do, yyyy') : 'Recently';
   };
 
   if (loading) {
