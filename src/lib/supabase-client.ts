@@ -1,17 +1,26 @@
-
 import { createClient } from '@supabase/supabase-js';
 import { Poem } from './types';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-console.log("Supabase Client Initializing with URL:", supabaseUrl);
+// Explicitly log the URL being used to the console for verification
+console.log("Supabase Client initialized with URL:", supabaseUrl);
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-export const fetchPoems = async (filter?: { theme?: string; search?: string }): Promise<Poem[]> => {
-  console.log("Supabase Diagnostic: Attempting to fetch all poems from 'poems' table...");
+/**
+ * Diagnostic helper to get raw row count
+ */
+export const fetchPoemsCount = async (): Promise<{ count: number | null; error: any }> => {
+  const { count, error } = await supabase
+    .from('poems')
+    .select('*', { count: 'exact', head: true });
   
+  return { count, error };
+};
+
+export const fetchPoems = async (filter?: { theme?: string; search?: string }): Promise<Poem[]> => {
   let query = supabase.from('poems').select('*');
 
   if (filter?.theme) {
@@ -20,19 +29,13 @@ export const fetchPoems = async (filter?: { theme?: string; search?: string }): 
 
   if (filter?.search) {
     const s = filter.search;
-    query = query.or(`title.ilike.%${s}%,theme.ilike.%${s}%,emotional_engine.ilike.%${s}%,roman.ilike.%${s}%,description.ilike.%${s}%`);
+    query = query.or(`title.ilike.%${s}%,theme.ilike.%${s}%,roman.ilike.%${s}%,description.ilike.%${s}%`);
   }
 
   const response = await query.order('date', { ascending: false });
   
-  console.log("--- RAW SUPABASE RESPONSE (fetchPoems) ---");
-  console.log("Data:", response.data);
-  console.log("Error:", response.error);
-  console.log("Status:", response.status);
-  console.log("StatusText:", response.statusText);
-  console.log("------------------------------------------");
-
   if (response.error) {
+    console.error("fetchPoems Error:", response.error);
     throw new Error(`Supabase Error [${response.error.code}]: ${response.error.message}`);
   }
   
@@ -47,7 +50,7 @@ export const fetchPoemById = async (id: string): Promise<Poem | null> => {
     .single();
 
   if (error) {
-    console.error(`Supabase Error (fetchPoemById ${id}):`, error.message);
+    console.error(`fetchPoemById Error:`, error.message);
     return null;
   }
   
@@ -60,7 +63,6 @@ export const fetchThemes = async (): Promise<string[]> => {
     .select('theme');
 
   if (response.error) {
-    console.error('Supabase Error (fetchThemes):', response.error.message);
     return [];
   }
   
@@ -69,17 +71,11 @@ export const fetchThemes = async (): Promise<string[]> => {
 };
 
 export const fetchFeaturedPoems = async (): Promise<Poem[]> => {
-  console.log("Supabase Diagnostic: Attempting to fetch featured poems (featured=true)...");
   const response = await supabase
     .from('poems')
     .select('*')
     .eq('featured', true)
     .order('date', { ascending: false });
-
-  console.log("--- RAW SUPABASE RESPONSE (fetchFeaturedPoems) ---");
-  console.log("Data:", response.data);
-  console.log("Error:", response.error);
-  console.log("-------------------------------------------------");
 
   if (response.error) {
     throw new Error(`Supabase Error [${response.error.code}]: ${response.error.message}`);

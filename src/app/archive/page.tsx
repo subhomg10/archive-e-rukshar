@@ -1,29 +1,27 @@
-
 "use client";
 
 import { useState, useEffect } from 'react';
 import { Navigation } from '@/components/Navigation';
 import { PoemCard } from '@/components/PoemCard';
 import { Poem } from '@/lib/types';
-import { fetchPoems, fetchThemes, fetchFeaturedPoems } from '@/lib/supabase-client';
+import { fetchPoems, fetchThemes, fetchFeaturedPoems, fetchPoemsCount } from '@/lib/supabase-client';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Filter, Loader2, AlertCircle, Star, Sparkles, Database, Bug } from 'lucide-react';
+import { Search, Loader2, AlertCircle, Star, Database, ShieldAlert, Activity } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 
-// HARDCODED TEST POEM FOR RENDERING VERIFICATION
 const TEST_POEM: Poem = {
-  id: "test-render-id",
-  title: "UI Rendering Test (Hardcoded)",
+  id: "render-test",
+  title: "Frontend Rendering Verification",
   theme: "Diagnostic",
   date: new Date().toISOString(),
-  author: "System Test",
+  author: "System",
   featured: true,
-  roman: "If you can read this, the React rendering system is working correctly.\nThe issue lies with the Supabase data fetching or permissions.",
-  description: "This is a temporary poem used to verify that the frontend components are functional.",
-  emotional_engine: "Test/Diagnostic"
+  roman: "This poem is hardcoded to prove that the UI components are functioning.\nIf you see this but no other poems, the issue is strictly with the data connection or RLS policies.",
+  description: "A temporary diagnostic placeholder.",
+  emotional_engine: "Stable"
 };
 
 export default function ArchivePage() {
@@ -31,46 +29,42 @@ export default function ArchivePage() {
   const [featuredPoems, setFeaturedPoems] = useState<Poem[]>([]);
   const [themes, setThemes] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
-  const [featuredLoading, setFeaturedLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTheme, setActiveTheme] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // Diagnostic states
+  const [dbCount, setDbCount] = useState<number | null>(null);
+  const [currentUrl] = useState(process.env.NEXT_PUBLIC_SUPABASE_URL);
 
-  // Initial data load: Themes and Featured Poems
   useEffect(() => {
-    const loadInitialData = async () => {
-      setFeaturedLoading(true);
-      setError(null);
-      try {
-        console.log("Archive: Starting initial data load...");
-        const [themeData, featuredData] = await Promise.all([
-          fetchThemes(),
-          fetchFeaturedPoems()
-        ]);
-        setThemes(themeData);
-        // Add TEST_POEM to featured list for visual confirmation
-        setFeaturedPoems([TEST_POEM, ...featuredData]);
-      } catch (err: any) {
-        console.error("Archive Load Error:", err);
-        setError(err.message || "Failed to connect to Supabase.");
-      } finally {
-        setFeaturedLoading(false);
+    const runDiagnostics = async () => {
+      const { count, error } = await fetchPoemsCount();
+      if (error) {
+        console.error("Diagnostic Count Error:", error);
+      } else {
+        setDbCount(count);
       }
     };
-    loadInitialData();
+    runDiagnostics();
   }, []);
 
-  // Filtered load: All/Search/Theme Poems
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
+      setError(null);
       try {
-        const data = await fetchPoems({ theme: activeTheme || undefined, search: searchQuery });
-        // Add TEST_POEM to the main list as well for visual confirmation
-        setPoems([TEST_POEM, ...data]);
+        const [themeData, featuredData, allData] = await Promise.all([
+          fetchThemes(),
+          fetchFeaturedPoems(),
+          fetchPoems({ theme: activeTheme || undefined, search: searchQuery })
+        ]);
+        
+        setThemes(themeData);
+        setFeaturedPoems([TEST_POEM, ...featuredData]);
+        setPoems([TEST_POEM, ...allData]);
       } catch (err: any) {
-        console.error("Archive Fetch Error:", err);
-        setError(err.message || "An unexpected error occurred.");
+        setError(err.message);
       } finally {
         setLoading(false);
       }
@@ -82,81 +76,77 @@ export default function ArchivePage() {
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      <main className="max-w-7xl mx-auto px-6 py-12 md:py-16 space-y-20">
+      <main className="max-w-7xl mx-auto px-6 py-12 space-y-12">
         
-        {/* Connection Status Banner */}
-        <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 flex items-center gap-3">
-          <Bug className="w-5 h-5 text-primary" />
-          <div className="text-sm">
-            <span className="font-semibold text-primary">Diagnostic Mode:</span> 
-            Check browser console (F12) for raw Supabase response objects. 
-            The "UI Rendering Test" poem below confirms the frontend is alive.
+        {/* Diagnostic Panel */}
+        <section className="bg-card/50 border border-primary/20 rounded-2xl p-6 space-y-4">
+          <div className="flex items-center gap-2 text-primary">
+            <Activity className="w-5 h-5" />
+            <h2 className="font-headline text-xl">Connection Diagnostics</h2>
           </div>
-        </div>
-
-        {/* Error Display */}
-        {error && (
-          <Alert variant="destructive" className="bg-destructive/10 border-destructive animate-in fade-in slide-in-from-top-4">
-            <AlertCircle className="h-5 w-5" />
-            <AlertTitle className="text-lg font-bold">Supabase Query Failed</AlertTitle>
-            <AlertDescription className="mt-2 space-y-4">
-              <p className="font-mono text-sm bg-black/20 p-2 rounded">{error}</p>
-              <div className="text-xs space-y-1">
-                <p>Possible causes:</p>
-                <ul className="list-disc pl-5">
-                  <li><strong>RLS Policy:</strong> Table exists but SELECT is denied.</li>
-                  <li><strong>Wrong Table Name:</strong> Table is not 'poems'.</li>
-                  <li><strong>API Key/URL:</strong> Credentials invalid for this domain.</li>
-                </ul>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm font-mono">
+            <div className="p-3 bg-black/20 rounded-lg">
+              <span className="text-muted-foreground block mb-1">Target URL:</span>
+              <span className="text-primary break-all">https://amkkbzjblsuzruzyurfc.supabase.co</span>
+            </div>
+            <div className="p-3 bg-black/20 rounded-lg">
+              <span className="text-muted-foreground block mb-1">Active URL in App:</span>
+              <span className={currentUrl?.includes('amkkbzjbl') ? "text-green-400" : "text-red-400"}>
+                {currentUrl || "NOT FOUND"}
+              </span>
+            </div>
+            <div className="p-3 bg-black/20 rounded-lg flex justify-between items-center">
+              <div>
+                <span className="text-muted-foreground block mb-1">Rows visible to Public Key:</span>
+                <span className="text-2xl font-bold text-foreground">{dbCount ?? "0"}</span>
               </div>
-            </AlertDescription>
+              {dbCount === 0 && (
+                <div className="flex items-center gap-2 text-yellow-500">
+                  <ShieldAlert className="w-4 h-4" />
+                  <span className="text-[10px] uppercase">Possible RLS Block</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {error && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Supabase Error</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
 
-        {/* 1. Featured Poems Panel */}
+        {/* Featured Section */}
         <section className="space-y-8">
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <h2 className="font-headline text-3xl md:text-4xl flex items-center gap-3 text-primary">
-                <Star className="w-6 h-6 fill-primary/20" />
-                Featured Verses
-              </h2>
-              <p className="text-muted-foreground text-sm font-light uppercase tracking-widest">Diagnostic Test Poem Included</p>
-            </div>
-          </div>
+          <h2 className="font-headline text-3xl md:text-4xl flex items-center gap-3 text-primary">
+            <Star className="w-6 h-6 fill-primary/20" />
+            Featured Echoes
+          </h2>
           
-          {featuredLoading ? (
-            <div className="h-48 flex items-center justify-center border border-border/30 rounded-2xl bg-card/10">
-              <Loader2 className="w-6 h-6 text-primary animate-spin" />
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {featuredPoems.map((poem, index) => (
-                <PoemCard key={`featured-${poem.id}`} poem={poem} index={index} />
-              ))}
-            </div>
-          )}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {featuredPoems.map((poem, index) => (
+              <PoemCard key={`feat-${poem.id}`} poem={poem} index={index} />
+            ))}
+          </div>
         </section>
 
-        <Separator className="bg-border/20" />
+        <Separator />
 
-        {/* 2. Search and Theme Selection Panel */}
-        <section className="space-y-10">
+        {/* Filter & All Section */}
+        <section className="space-y-12">
           <div className="flex flex-col md:flex-row gap-8 items-end justify-between">
-            <div className="space-y-6 w-full md:w-auto">
-              <div className="space-y-1">
-                <h3 className="text-xs font-medium uppercase tracking-[0.2em] text-primary">Explore</h3>
-                <h2 className="font-headline text-3xl">Filter the Archive</h2>
-              </div>
-              
+            <div className="space-y-6">
               <div className="flex flex-wrap gap-2">
                 <Button
                   variant={activeTheme === null ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => setActiveTheme(null)}
-                  className="rounded-full px-5 text-xs tracking-wider"
+                  className="rounded-full"
                 >
-                  All
+                  All Themes
                 </Button>
                 {themes.map((theme) => (
                   <Button
@@ -164,7 +154,7 @@ export default function ArchivePage() {
                     variant={activeTheme === theme ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => setActiveTheme(theme)}
-                    className="rounded-full px-5 text-xs tracking-wider"
+                    className="rounded-full"
                   >
                     {theme}
                   </Button>
@@ -173,55 +163,42 @@ export default function ArchivePage() {
             </div>
 
             <div className="relative w-full md:w-96">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder="Search archives..."
+                placeholder="Search the archive..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-11 h-12 bg-card/30 border-border/50 rounded-xl"
+                className="pl-4 h-12 bg-card/30 rounded-xl"
               />
             </div>
           </div>
 
-          {/* 3. All Verses Gallery */}
           <div className="space-y-8">
-            <div className="flex items-center gap-4">
-              <h2 className="font-headline text-3xl md:text-4xl">All Verses</h2>
-              <div className="h-[1px] w-full bg-border/20" />
-            </div>
-
+            <h2 className="font-headline text-3xl md:text-4xl">All Verses</h2>
             {loading ? (
-              <div className="h-64 flex items-center justify-center">
-                <Loader2 className="w-8 h-8 text-primary animate-spin" />
+              <div className="flex justify-center py-20">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
               </div>
             ) : (
-              <motion.div 
-                layout
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-              >
-                <AnimatePresence mode="popLayout">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <AnimatePresence>
                   {poems.map((poem, index) => (
                     <PoemCard key={`all-${poem.id}`} poem={poem} index={index} />
                   ))}
                 </AnimatePresence>
-              </motion.div>
+              </div>
             )}
 
-            {!loading && !error && poems.length <= 1 && (
-              <div className="h-64 flex flex-col items-center justify-center text-muted-foreground space-y-4 border border-dashed border-border/30 rounded-2xl bg-card/5">
-                <Database className="w-8 h-8 opacity-20" />
-                <p className="font-light italic text-center px-4">
-                  No poems found in Supabase table 'poems'.<br/>
-                  Only the test poem is rendering.
+            {!loading && poems.length <= 1 && dbCount === 0 && (
+              <div className="text-center py-20 border border-dashed rounded-3xl space-y-4">
+                <Database className="w-12 h-12 mx-auto text-muted-foreground opacity-20" />
+                <p className="text-muted-foreground">
+                  The rendering test is visible, but no data was returned from Supabase.<br/>
+                  Check RLS policies if your table is not empty.
                 </p>
-                <Button variant="ghost" size="sm" onClick={() => { setSearchQuery(''); setActiveTheme(null); }}>
-                  Clear Filters
-                </Button>
               </div>
             )}
           </div>
         </section>
-
       </main>
     </div>
   );
