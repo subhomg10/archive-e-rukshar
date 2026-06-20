@@ -1,24 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
-import { Poem } from './types';
+import { Poem, Review } from './types';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-// Explicitly log the URL being used to the console for verification
-console.log("Supabase Client initialized with URL:", supabaseUrl);
-
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
-/**
- * Diagnostic helper to get raw row count
- */
-export const fetchPoemsCount = async (): Promise<{ count: number | null; error: any }> => {
-  const { count, error } = await supabase
-    .from('poems')
-    .select('*', { count: 'exact', head: true });
-  
-  return { count, error };
-};
 
 export const fetchPoems = async (filter?: { theme?: string; search?: string }): Promise<Poem[]> => {
   let query = supabase.from('poems').select('*');
@@ -29,7 +15,7 @@ export const fetchPoems = async (filter?: { theme?: string; search?: string }): 
 
   if (filter?.search) {
     const s = filter.search;
-    query = query.or(`title.ilike.%${s}%,theme.ilike.%${s}%,roman.ilike.%${s}%,description.ilike.%${s}%`);
+    query = query.or(`title.ilike.%${s}%,theme.ilike.%${s}%,roman.ilike.%${s}%,description.ilike.%${s}%,emotional_engine.ilike.%${s}%`);
   }
 
   const response = await query.order('date', { ascending: false });
@@ -82,4 +68,32 @@ export const fetchFeaturedPoems = async (): Promise<Poem[]> => {
   }
   
   return (response.data || []) as Poem[];
+};
+
+/**
+ * Reviews fetching and submission
+ */
+export const fetchReviews = async (poemId: string): Promise<Review[]> => {
+  const { data, error } = await supabase
+    .from('poem_reviews')
+    .select('*')
+    .eq('poem_id', poemId)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error("fetchReviews Error:", error);
+    return [];
+  }
+  return (data || []) as Review[];
+};
+
+export const addReview = async (review: Omit<Review, 'id' | 'created_at'>) => {
+  const { error } = await supabase
+    .from('poem_reviews')
+    .insert([review]);
+
+  if (error) {
+    console.error("addReview Error:", error);
+    throw error;
+  }
 };
