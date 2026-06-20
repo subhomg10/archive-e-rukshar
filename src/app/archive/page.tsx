@@ -67,16 +67,6 @@ export default function ArchivePage() {
           </Alert>
         )}
 
-        {/* Stats Section */}
-        <section className="space-y-4">
-          <header className="flex items-center space-x-3 mb-6">
-            <div className="h-px bg-border/50 flex-1" />
-            <span className="text-[10px] tracking-[0.4em] uppercase text-muted-foreground font-light">Archive Statistics</span>
-            <div className="h-px bg-border/50 flex-1" />
-          </header>
-          <ArchiveStats stats={stats} />
-        </section>
-
         {/* Featured Section */}
         {featuredPoems.length > 0 && (
           <section className="space-y-8">
@@ -187,6 +177,18 @@ export default function ArchivePage() {
               </>
             )}
           </div>
+        </section>
+
+        <Separator className="bg-border/30" />
+
+        {/* Stats Section moved to bottom */}
+        <section className="space-y-8 pt-8">
+          <header className="flex items-center space-x-3 mb-6">
+            <div className="h-px bg-border/50 flex-1" />
+            <span className="text-[10px] tracking-[0.4em] uppercase text-muted-foreground font-light">Archive Statistics</span>
+            <div className="h-px bg-border/50 flex-1" />
+          </header>
+          <ArchiveStats stats={stats} />
         </section>
       </main>
 

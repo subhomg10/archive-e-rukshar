@@ -24,7 +24,7 @@ export function ArchiveStats({ stats }: ArchiveStatsProps) {
       color: 'text-primary'
     },
     { 
-      label: 'Thematic Echoes', 
+      label: 'Resonance Themes', 
       value: stats.totalThemes, 
       icon: Layers,
       color: 'text-primary/80'
