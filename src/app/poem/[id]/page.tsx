@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -33,7 +34,7 @@ export default function PoemPage() {
   const [loadingReviews, setLoadingReviews] = useState(true);
   const [newReview, setNewReview] = useState({
     user_name: '',
-    rating: 5,
+    rating: 0,
     comment: ''
   });
   const [submittingReview, setSubmittingReview] = useState(false);
@@ -77,10 +78,10 @@ export default function PoemPage() {
 
   const handleReviewSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newReview.user_name || !newReview.comment) {
+    if (!newReview.user_name || !newReview.comment || newReview.rating === 0) {
       toast({
         title: "Fragment missing",
-        description: "Please provide both your name and reflection."
+        description: "Please provide your name, a rating, and your reflection."
       });
       return;
     }
@@ -94,7 +95,7 @@ export default function PoemPage() {
       
       const updatedReviews = await fetchReviews(id as string);
       setReviews(updatedReviews);
-      setNewReview({ user_name: '', rating: 5, comment: '' });
+      setNewReview({ user_name: '', rating: 0, comment: '' });
       
       toast({
         title: "Reflection saved",
@@ -305,7 +306,7 @@ export default function PoemPage() {
                     <div className="space-y-3">
                       <label className="text-[10px] uppercase tracking-widest text-muted-foreground ml-1">Your Name</label>
                       <Input 
-                        placeholder="Anonymous wanderer"
+                        placeholder=""
                         value={newReview.user_name}
                         onChange={(e) => setNewReview({...newReview, user_name: e.target.value})}
                         className="bg-background/40 border-border/50 rounded-xl focus:border-primary/50"
@@ -334,7 +335,7 @@ export default function PoemPage() {
                   <div className="space-y-3">
                     <label className="text-[10px] uppercase tracking-widest text-muted-foreground ml-1">Your Reflection</label>
                     <Textarea 
-                      placeholder="How do these words find you?"
+                      placeholder=""
                       value={newReview.comment}
                       onChange={(e) => setNewReview({...newReview, comment: e.target.value})}
                       className="min-h-[120px] bg-background/40 border-border/50 rounded-2xl focus:border-primary/50 resize-none font-light"
@@ -354,6 +355,10 @@ export default function PoemPage() {
 
             {/* Reviews List */}
             <div className="space-y-8">
+              {reviews.length > 0 && (
+                <h3 className="text-xl font-headline text-center mb-8">Reviews</h3>
+              )}
+              
               {loadingReviews ? (
                 <div className="flex justify-center py-12">
                   <Loader2 className="w-6 h-6 text-primary animate-spin" />
