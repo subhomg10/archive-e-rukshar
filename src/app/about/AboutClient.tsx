@@ -40,13 +40,13 @@ export function AboutClient() {
             <p className="text-primary tracking-[0.3em] uppercase text-[10px] md:text-xs font-light">A Sanctuary for Narrative Verse</p>
           </motion.header>
 
-          {/* Profile Identity - NEW POSITION */}
+          {/* Profile Identity */}
           <motion.div variants={itemVariants} className="flex flex-col items-center space-y-8">
             <div className="relative group">
               <div className="absolute -inset-1 bg-gradient-to-tr from-primary/20 to-transparent rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
               <Avatar className="w-32 h-32 md:w-40 md:h-40 border-2 border-border/50 p-1.5 bg-background relative">
                 <AvatarImage 
-                  src="https://amkkbzjblsuzruzyurfc.supabase.co/storage/v1/object/public/profile-image/2.jpeg" 
+                  src="https://amkkbzjblsuzruzyurfc.supabase.co/storage/v1/object/public/profile-image/rukshar_pfp.jpeg" 
                   alt="Rukshar" 
                   className="rounded-full object-cover"
                 />
