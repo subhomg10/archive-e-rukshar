@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -7,7 +8,7 @@ import { Poem } from '@/lib/types';
 import { fetchPoems, fetchThemes, fetchFeaturedPoems } from '@/lib/supabase-client';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Filter, Loader2, AlertCircle, Star, Sparkles } from 'lucide-react';
+import { Search, Filter, Loader2, AlertCircle, Star, Sparkles, Database } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
@@ -26,6 +27,7 @@ export default function ArchivePage() {
   useEffect(() => {
     const loadInitialData = async () => {
       setFeaturedLoading(true);
+      setError(null);
       try {
         const [themeData, featuredData] = await Promise.all([
           fetchThemes(),
@@ -35,6 +37,7 @@ export default function ArchivePage() {
         setFeaturedPoems(featuredData);
       } catch (err: any) {
         console.error("Failed to load initial archive data", err);
+        setError(err.message || "Failed to connect to Supabase. Please verify project credentials.");
       } finally {
         setFeaturedLoading(false);
       }
@@ -46,11 +49,11 @@ export default function ArchivePage() {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      setError(null);
       try {
         const data = await fetchPoems({ theme: activeTheme || undefined, search: searchQuery });
         setPoems(data);
       } catch (err: any) {
+        console.error("Error fetching all poems:", err);
         setError(err.message || "An unexpected error occurred while fetching poems.");
       } finally {
         setLoading(false);
@@ -65,6 +68,20 @@ export default function ArchivePage() {
       
       <main className="max-w-7xl mx-auto px-6 py-12 md:py-16 space-y-20">
         
+        {/* Error Display */}
+        {error && (
+          <Alert variant="destructive" className="bg-destructive/5 border-destructive/20 animate-in fade-in slide-in-from-top-4 duration-500">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Connection Diagnostic</AlertTitle>
+            <AlertDescription className="space-y-2">
+              <p>{error}</p>
+              <p className="text-xs opacity-70">
+                Tip: If you see "Row Level Security" or "Permissions" errors, ensure your table 'poems' has a public SELECT policy.
+              </p>
+            </AlertDescription>
+          </Alert>
+        )}
+
         {/* 1. Featured Poems Panel */}
         <section className="space-y-8">
           <div className="flex items-center justify-between">
@@ -88,8 +105,9 @@ export default function ArchivePage() {
               ))}
             </div>
           ) : (
-            <div className="h-48 flex items-center justify-center border border-dashed border-border/30 rounded-2xl">
+            <div className="h-48 flex flex-col items-center justify-center border border-dashed border-border/30 rounded-2xl bg-card/5">
               <p className="text-muted-foreground italic font-light">No featured echoes currently curated.</p>
+              <p className="text-[10px] text-muted-foreground/50 mt-2 uppercase tracking-tighter">Table 'poems' - featured=true</p>
             </div>
           )}
         </section>
@@ -139,17 +157,6 @@ export default function ArchivePage() {
             </div>
           </div>
 
-          {/* Error Display */}
-          {error && (
-            <Alert variant="destructive" className="bg-destructive/5 border-destructive/20">
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Connection Issue</AlertTitle>
-              <AlertDescription>
-                {error}. Please verify your Supabase project settings and table availability.
-              </AlertDescription>
-            </Alert>
-          )}
-
           {/* 3. All Verses Gallery */}
           <div className="space-y-8">
             <div className="flex items-center gap-4">
@@ -176,11 +183,13 @@ export default function ArchivePage() {
 
             {!loading && !error && poems.length === 0 && (
               <div className="h-64 flex flex-col items-center justify-center text-muted-foreground space-y-4 border border-dashed border-border/30 rounded-2xl bg-card/5">
-                <Filter className="w-8 h-8 opacity-20" />
-                <p className="font-light italic">No echoes found matching your current selection.</p>
-                <Button variant="ghost" size="sm" onClick={() => { setSearchQuery(''); setActiveTheme(null); }}>
-                  Clear all filters
-                </Button>
+                <Database className="w-8 h-8 opacity-20" />
+                <p className="font-light italic">No echoes found in your archive.</p>
+                <div className="flex gap-2">
+                  <Button variant="ghost" size="sm" onClick={() => { setSearchQuery(''); setActiveTheme(null); }}>
+                    Clear all filters
+                  </Button>
+                </div>
               </div>
             )}
           </div>
