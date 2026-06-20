@@ -6,7 +6,6 @@ import { Poem } from '@/lib/types';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, ArrowRight, Star } from 'lucide-react';
-import { format, isValid, parseISO } from 'date-fns';
 
 interface PoemCardProps {
   poem: Poem;
@@ -14,20 +13,6 @@ interface PoemCardProps {
 }
 
 export function PoemCard({ poem, index }: PoemCardProps) {
-  // Gracefully handle potentially missing or invalid dates
-  let formattedDate = "Recently";
-  if (poem.date) {
-    // Attempt parsing as ISO first, then standard Date
-    let date = parseISO(poem.date);
-    if (!isValid(date)) {
-      date = new Date(poem.date);
-    }
-    
-    if (isValid(date)) {
-      formattedDate = format(date, 'MMM d, yyyy');
-    }
-  }
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -55,9 +40,9 @@ export function PoemCard({ poem, index }: PoemCardProps) {
                   </Badge>
                 )}
               </div>
-              <div className="flex items-center text-[10px] text-muted-foreground">
+              <div className="flex items-center text-[10px] text-muted-foreground uppercase tracking-widest font-body">
                 <Calendar className="w-3 h-3 mr-1" />
-                {formattedDate}
+                {poem.date}
               </div>
             </div>
             <CardTitle className="font-headline text-2xl group-hover:text-primary transition-colors duration-300 leading-tight">

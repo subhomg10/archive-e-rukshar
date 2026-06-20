@@ -16,7 +16,7 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { format, isValid, parseISO } from 'date-fns';
+import { format } from 'date-fns';
 
 export default function PoemPage() {
   const { id } = useParams();
@@ -111,18 +111,6 @@ export default function PoemPage() {
     }
   };
 
-  const getFormattedDate = (dateStr: string | null | undefined) => {
-    if (!dateStr) return 'Date Unknown';
-    
-    // Attempt parsing as ISO first, then standard Date
-    let date = parseISO(dateStr);
-    if (!isValid(date)) {
-      date = new Date(dateStr);
-    }
-    
-    return isValid(date) ? format(date, 'MMMM do, yyyy') : 'Recently';
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -173,7 +161,7 @@ export default function PoemPage() {
             <div className="flex items-center justify-center space-x-2 text-muted-foreground font-light italic">
               <span>by {poem.author}</span>
               <span className="mx-2 opacity-30">|</span>
-              <span>{getFormattedDate(poem.date)}</span>
+              <span className="font-body text-xs tracking-wider uppercase">{poem.date}</span>
             </div>
           </header>
 
@@ -392,7 +380,7 @@ export default function PoemPage() {
                               </div>
                             </div>
                             <time className="text-[10px] text-muted-foreground tracking-widest uppercase">
-                              {review.created_at ? format(new Date(review.created_at), 'MMM d, yyyy') : 'Recently'}
+                              {review.created_at ? format(new Date(review.created_at), 'MMM d, yyyy') : ''}
                             </time>
                           </CardHeader>
                           <CardContent className="p-6 pt-2">
