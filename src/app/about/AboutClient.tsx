@@ -4,6 +4,7 @@ import { Navigation } from '@/components/Navigation';
 import { motion } from 'framer-motion';
 import { Instagram, Mail, BookOpen, PenTool, Sparkles } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 export function AboutClient() {
   const containerVariants = {
@@ -88,7 +89,26 @@ export function AboutClient() {
           </motion.section>
 
           {/* Contact */}
-          <motion.section variants={itemVariants} className="space-y-12">
+          <motion.section variants={itemVariants} className="space-y-16">
+            <div className="flex flex-col items-center space-y-8">
+              <div className="relative group">
+                <div className="absolute -inset-1 bg-gradient-to-tr from-primary/20 to-transparent rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+                <Avatar className="w-32 h-32 md:w-40 md:h-40 border-2 border-border/50 p-1.5 bg-background relative">
+                  <AvatarImage 
+                    src="https://amkkbzjblsuzruzyurfc.supabase.co/storage/v1/object/public/profile-image/2.jpeg" 
+                    alt="Rukshar" 
+                    className="rounded-full object-cover"
+                  />
+                  <AvatarFallback className="bg-muted text-primary">R</AvatarFallback>
+                </Avatar>
+              </div>
+              
+              <div className="text-center space-y-2">
+                <h3 className="text-3xl md:text-4xl font-headline tracking-tight">Rukshar</h3>
+                <p className="text-[10px] tracking-[0.4em] uppercase text-primary/60 font-medium">Poet & Storyteller</p>
+              </div>
+            </div>
+
             <div className="text-center space-y-4">
               <h2 className="text-2xl md:text-3xl font-headline">Connect with the Words</h2>
               <p className="text-sm text-muted-foreground font-light">For inquiries, collaborations, or shared reflections.</p>
