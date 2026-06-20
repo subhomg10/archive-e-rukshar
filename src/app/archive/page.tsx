@@ -4,25 +4,13 @@ import { useState, useEffect } from 'react';
 import { Navigation } from '@/components/Navigation';
 import { PoemCard } from '@/components/PoemCard';
 import { Poem } from '@/lib/types';
-import { fetchPoems, fetchThemes, fetchFeaturedPoems, fetchPoemsCount } from '@/lib/supabase-client';
+import { fetchPoems, fetchThemes, fetchFeaturedPoems } from '@/lib/supabase-client';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Loader2, AlertCircle, Star, Database, ShieldAlert, Activity } from 'lucide-react';
+import { Search, Loader2, AlertCircle, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
-
-const TEST_POEM: Poem = {
-  id: "render-test",
-  title: "Frontend Rendering Verification",
-  theme: "Diagnostic",
-  date: new Date().toISOString(),
-  author: "System",
-  featured: true,
-  roman: "This poem is hardcoded to prove that the UI components are functioning.\nIf you see this but no other poems, the issue is strictly with the data connection or RLS policies.",
-  description: "A temporary diagnostic placeholder.",
-  emotional_engine: "Stable"
-};
 
 export default function ArchivePage() {
   const [poems, setPoems] = useState<Poem[]>([]);
@@ -32,22 +20,6 @@ export default function ArchivePage() {
   const [error, setError] = useState<string | null>(null);
   const [activeTheme, setActiveTheme] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  
-  // Diagnostic states
-  const [dbCount, setDbCount] = useState<number | null>(null);
-  const [currentUrl] = useState(process.env.NEXT_PUBLIC_SUPABASE_URL);
-
-  useEffect(() => {
-    const runDiagnostics = async () => {
-      const { count, error } = await fetchPoemsCount();
-      if (error) {
-        console.error("Diagnostic Count Error:", error);
-      } else {
-        setDbCount(count);
-      }
-    };
-    runDiagnostics();
-  }, []);
 
   useEffect(() => {
     const loadData = async () => {
@@ -61,8 +33,8 @@ export default function ArchivePage() {
         ]);
         
         setThemes(themeData);
-        setFeaturedPoems([TEST_POEM, ...featuredData]);
-        setPoems([TEST_POEM, ...allData]);
+        setFeaturedPoems(featuredData);
+        setPoems(allData);
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -76,130 +48,132 @@ export default function ArchivePage() {
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      <main className="max-w-7xl mx-auto px-6 py-12 space-y-12">
+      <main className="max-w-7xl mx-auto px-6 py-12 space-y-16">
         
-        {/* Diagnostic Panel */}
-        <section className="bg-card/50 border border-primary/20 rounded-2xl p-6 space-y-4">
-          <div className="flex items-center gap-2 text-primary">
-            <Activity className="w-5 h-5" />
-            <h2 className="font-headline text-xl">Connection Diagnostics</h2>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm font-mono">
-            <div className="p-3 bg-black/20 rounded-lg">
-              <span className="text-muted-foreground block mb-1">Target URL:</span>
-              <span className="text-primary break-all">https://amkkbzjblsuzruzyurfc.supabase.co</span>
-            </div>
-            <div className="p-3 bg-black/20 rounded-lg">
-              <span className="text-muted-foreground block mb-1">Active URL in App:</span>
-              <span className={currentUrl?.includes('amkkbzjbl') ? "text-green-400" : "text-red-400"}>
-                {currentUrl || "NOT FOUND"}
-              </span>
-            </div>
-            <div className="p-3 bg-black/20 rounded-lg flex justify-between items-center">
-              <div>
-                <span className="text-muted-foreground block mb-1">Rows visible to Public Key:</span>
-                <span className="text-2xl font-bold text-foreground">{dbCount ?? "0"}</span>
-              </div>
-              {dbCount === 0 && (
-                <div className="flex items-center gap-2 text-yellow-500">
-                  <ShieldAlert className="w-4 h-4" />
-                  <span className="text-[10px] uppercase">Possible RLS Block</span>
-                </div>
-              )}
-            </div>
-          </div>
-        </section>
-
         {error && (
-          <Alert variant="destructive">
+          <Alert variant="destructive" className="border-destructive/20 bg-destructive/5">
             <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Supabase Error</AlertTitle>
+            <AlertTitle>Archive Error</AlertTitle>
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
 
         {/* Featured Section */}
-        <section className="space-y-8">
-          <h2 className="font-headline text-3xl md:text-4xl flex items-center gap-3 text-primary">
-            <Star className="w-6 h-6 fill-primary/20" />
-            Featured Echoes
-          </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredPoems.map((poem, index) => (
-              <PoemCard key={`feat-${poem.id}`} poem={poem} index={index} />
-            ))}
-          </div>
-        </section>
+        {featuredPoems.length > 0 && (
+          <section className="space-y-8">
+            <header className="space-y-2">
+              <h2 className="font-headline text-3xl md:text-4xl flex items-center gap-3 text-primary">
+                <Star className="w-6 h-6 fill-primary/20" />
+                Featured Echoes
+              </h2>
+              <p className="text-muted-foreground font-light text-sm tracking-wide">Handpicked verses that resonate with the current season.</p>
+            </header>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {featuredPoems.map((poem, index) => (
+                <PoemCard key={`feat-${poem.id}`} poem={poem} index={index} />
+              ))}
+            </div>
+          </section>
+        )}
 
-        <Separator />
+        <Separator className="bg-border/30" />
 
-        {/* Filter & All Section */}
-        <section className="space-y-12">
-          <div className="flex flex-col md:flex-row gap-8 items-end justify-between">
-            <div className="space-y-6">
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  variant={activeTheme === null ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setActiveTheme(null)}
-                  className="rounded-full"
-                >
-                  All Themes
-                </Button>
-                {themes.map((theme) => (
+        {/* Search & Filters Section */}
+        <section className="space-y-10">
+          <div className="flex flex-col space-y-8">
+            <div className="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between">
+              <div className="space-y-4 w-full md:w-auto">
+                <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-medium">Filter by Resonance</span>
+                <div className="flex flex-wrap gap-2">
                   <Button
-                    key={theme}
-                    variant={activeTheme === theme ? 'default' : 'outline'}
+                    variant={activeTheme === null ? 'default' : 'outline'}
                     size="sm"
-                    onClick={() => setActiveTheme(theme)}
-                    className="rounded-full"
+                    onClick={() => setActiveTheme(null)}
+                    className="rounded-full px-5 text-xs font-light tracking-wider"
                   >
-                    {theme}
+                    All Themes
                   </Button>
-                ))}
+                  {themes.map((theme) => (
+                    <Button
+                      key={theme}
+                      variant={activeTheme === theme ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setActiveTheme(theme)}
+                      className="rounded-full px-5 text-xs font-light tracking-wider"
+                    >
+                      {theme}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="relative w-full md:w-96">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search title, theme, or fragments..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-11 h-12 bg-card/20 border-border/50 rounded-xl focus:border-primary/50 transition-colors placeholder:text-muted-foreground/50 font-light"
+                />
               </div>
             </div>
-
-            <div className="relative w-full md:w-96">
-              <Input
-                placeholder="Search the archive..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-4 h-12 bg-card/30 rounded-xl"
-              />
-            </div>
           </div>
 
+          {/* All Verses Section */}
           <div className="space-y-8">
-            <h2 className="font-headline text-3xl md:text-4xl">All Verses</h2>
+            <header className="flex items-end justify-between">
+              <h2 className="font-headline text-3xl md:text-4xl">All Verses</h2>
+              <span className="text-[10px] text-muted-foreground tracking-widest uppercase font-light">
+                {poems.length} {poems.length === 1 ? 'Fragment' : 'Fragments'}
+              </span>
+            </header>
+
             {loading ? (
-              <div className="flex justify-center py-20">
-                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+              <div className="flex flex-col items-center justify-center py-32 space-y-4">
+                <Loader2 className="w-8 h-8 animate-spin text-primary/40" />
+                <p className="text-xs text-muted-foreground tracking-[0.2em] uppercase">Consulting the Archive</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <AnimatePresence>
-                  {poems.map((poem, index) => (
-                    <PoemCard key={`all-${poem.id}`} poem={poem} index={index} />
-                  ))}
-                </AnimatePresence>
-              </div>
-            )}
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  <AnimatePresence mode="popLayout">
+                    {poems.map((poem, index) => (
+                      <PoemCard key={`all-${poem.id}`} poem={poem} index={index} />
+                    ))}
+                  </AnimatePresence>
+                </div>
 
-            {!loading && poems.length <= 1 && dbCount === 0 && (
-              <div className="text-center py-20 border border-dashed rounded-3xl space-y-4">
-                <Database className="w-12 h-12 mx-auto text-muted-foreground opacity-20" />
-                <p className="text-muted-foreground">
-                  The rendering test is visible, but no data was returned from Supabase.<br/>
-                  Check RLS policies if your table is not empty.
-                </p>
-              </div>
+                {!loading && poems.length === 0 && (
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="text-center py-32 border border-dashed border-border/50 rounded-3xl space-y-4"
+                  >
+                    <div className="w-12 h-12 mx-auto rounded-full bg-muted/30 flex items-center justify-center">
+                      <Search className="w-5 h-5 text-muted-foreground/50" />
+                    </div>
+                    <p className="text-muted-foreground font-light italic">
+                      No verses found matching your current filters.
+                    </p>
+                    <Button 
+                      variant="link" 
+                      onClick={() => { setActiveTheme(null); setSearchQuery(''); }}
+                      className="text-primary hover:text-primary/80"
+                    >
+                      Clear all filters
+                    </Button>
+                  </motion.div>
+                )}
+              </>
             )}
           </div>
         </section>
       </main>
+
+      <footer className="max-w-7xl mx-auto px-6 py-20 text-center border-t border-border/30 mt-20">
+        <p className="text-[10px] tracking-[0.5em] uppercase text-muted-foreground/50">Rukshar's Archive &copy; {new Date().getFullYear()}</p>
+      </footer>
     </div>
   );
 }
