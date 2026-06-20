@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 
 const navItems = [
   { name: 'Home', path: '/archive' },
-  { name: 'Statistics', path: '/statistics' },
+  { name: 'Stats', path: '/statistics' },
   { name: 'About', path: '/about' },
 ];
 
@@ -16,15 +16,15 @@ export function Navigation() {
 
   return (
     <nav className="sticky top-0 z-50 w-full premium-blur border-b border-border/50">
-      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between gap-4">
         <Link 
           href="/" 
-          className="font-headline text-xl tracking-wide text-primary hover:opacity-80 transition-opacity"
+          className="font-headline text-lg sm:text-xl tracking-wide text-primary hover:opacity-80 transition-opacity truncate shrink-0"
         >
           Rukshar's Archive
         </Link>
         
-        <ul className="flex gap-8 items-center">
+        <ul className="flex gap-4 sm:gap-6 md:gap-8 items-center">
           {navItems.map((item) => {
             const isActive = pathname === item.path;
             return (
@@ -32,7 +32,7 @@ export function Navigation() {
                 <Link
                   href={item.path}
                   className={cn(
-                    "relative py-1 text-sm font-medium transition-colors hover:text-primary",
+                    "relative py-1 text-xs sm:text-sm font-medium transition-colors hover:text-primary whitespace-nowrap",
                     isActive ? "text-primary" : "text-muted-foreground"
                   )}
                 >

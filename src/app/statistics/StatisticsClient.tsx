@@ -35,29 +35,29 @@ export default function StatisticsClient() {
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      <main className="max-w-5xl mx-auto px-6 py-20 md:py-32">
+      <main className="max-w-5xl mx-auto px-4 md:px-6 py-12 md:py-24 lg:py-32">
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="space-y-16"
+          className="space-y-12 md:space-y-16"
         >
-          <header className="space-y-4 text-center">
-            <h1 className="text-5xl md:text-7xl font-headline tracking-tight">Archive Analytics</h1>
-            <p className="text-primary tracking-[0.2em] uppercase text-xs font-light">Measuring the weight of words</p>
+          <header className="space-y-4 text-center px-2">
+            <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-headline tracking-tight leading-tight">Archive Analytics</h1>
+            <p className="text-primary tracking-[0.2em] uppercase text-[10px] md:text-xs font-light">Measuring the weight of words</p>
           </header>
 
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-20 space-y-4">
-              <Loader2 className="w-8 h-8 animate-spin text-primary/40" />
-              <p className="text-xs text-muted-foreground tracking-[0.2em] uppercase">Calculating resonance...</p>
+            <div className="flex flex-col items-center justify-center py-20 md:py-32 space-y-4">
+              <Loader2 className="w-6 h-6 md:w-8 md:h-8 animate-spin text-primary/40" />
+              <p className="text-[10px] text-muted-foreground tracking-[0.2em] uppercase">Calculating resonance...</p>
             </div>
           ) : (
-            <section className="space-y-12">
+            <section className="space-y-10 md:space-y-12">
               <ArchiveStats stats={stats} />
               
-              <div className="pt-12 border-t border-border/30 text-center">
-                <p className="text-sm text-muted-foreground font-light italic max-w-lg mx-auto">
+              <div className="pt-8 md:pt-12 border-t border-border/30 text-center">
+                <p className="text-xs md:text-sm text-muted-foreground font-light italic max-w-md md:max-w-lg mx-auto px-4">
                   Every statistic represents a fragment of memory, a shared resonance, or a voice preserved within this digital sanctuary.
                 </p>
               </div>
@@ -66,8 +66,8 @@ export default function StatisticsClient() {
         </motion.div>
       </main>
 
-      <footer className="max-w-7xl mx-auto px-6 py-20 text-center opacity-30 mt-20">
-        <p className="text-[10px] tracking-[0.5em] uppercase text-muted-foreground">Rukshar's Archive &copy; {new Date().getFullYear()}</p>
+      <footer className="max-w-7xl mx-auto px-6 py-12 md:py-20 text-center opacity-30 mt-12 md:mt-20">
+        <p className="text-[8px] md:text-[10px] tracking-[0.5em] uppercase text-muted-foreground">Rukshar's Archive &copy; {new Date().getFullYear()}</p>
       </footer>
     </div>
   );

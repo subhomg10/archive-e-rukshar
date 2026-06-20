@@ -110,56 +110,56 @@ export function PoemClient({ initialPoem: poem }: PoemClientProps) {
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      <main className="max-w-6xl mx-auto px-6 py-20 md:py-32">
+      <main className="max-w-6xl mx-auto px-4 md:px-6 py-12 md:py-24">
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="space-y-16"
+          className="space-y-10 md:space-y-16"
         >
           {/* Back Button */}
           <Button 
             variant="ghost" 
             size="sm" 
             onClick={() => router.back()}
-            className="text-muted-foreground hover:text-primary transition-colors -ml-3 group"
+            className="text-muted-foreground hover:text-primary transition-colors -ml-3 group h-8"
           >
             <ChevronLeft className="w-4 h-4 mr-1 group-hover:-translate-x-1 transition-transform" />
             Archive
           </Button>
 
           {/* Poem Header */}
-          <header className="space-y-4 text-center">
-            <Badge variant="outline" className="font-normal tracking-[0.2em] border-primary/20 text-primary uppercase text-[10px] px-3">
+          <header className="space-y-4 md:space-y-6 text-center">
+            <Badge variant="outline" className="font-normal tracking-[0.2em] border-primary/20 text-primary uppercase text-[8px] md:text-[10px] px-3">
               {poem.theme}
             </Badge>
-            <h1 className="text-5xl md:text-7xl font-headline tracking-tight leading-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-headline tracking-tight leading-tight px-2">
               {poem.title}
             </h1>
-            <div className="flex items-center justify-center space-x-2 text-muted-foreground font-light italic">
+            <div className="flex flex-wrap items-center justify-center gap-2 text-muted-foreground font-light italic text-sm md:text-base">
               <span>by {poem.author}</span>
-              <span className="mx-2 opacity-30">|</span>
-              <span className="font-body text-xs tracking-wider uppercase">
+              <span className="hidden sm:inline opacity-30">|</span>
+              <span className="font-body text-[10px] md:text-xs tracking-wider uppercase">
                 {poem.date}
               </span>
             </div>
           </header>
 
-          <Separator className="bg-border/30 max-w-[100px] mx-auto" />
+          <Separator className="bg-border/30 max-w-[80px] md:max-w-[100px] mx-auto" />
 
           {/* Poem Content Tabs */}
           <Tabs defaultValue="roman" className="w-full">
-            <div className="flex justify-center mb-12">
-              <TabsList className="bg-card/50 border border-border/50 rounded-full h-auto p-1">
-                <TabsTrigger value="roman" className="rounded-full px-6 py-2 text-xs uppercase tracking-widest">Roman</TabsTrigger>
-                {poem.hindi && <TabsTrigger value="hindi" className="rounded-full px-6 py-2 text-xs uppercase tracking-widest">Hindi</TabsTrigger>}
-                {poem.urdu && <TabsTrigger value="urdu" className="rounded-full px-6 py-2 text-xs uppercase tracking-widest">Urdu</TabsTrigger>}
+            <div className="flex justify-center mb-8 md:mb-12">
+              <TabsList className="bg-card/50 border border-border/50 rounded-full h-auto p-1 flex-wrap justify-center">
+                <TabsTrigger value="roman" className="rounded-full px-4 md:px-6 py-1.5 md:py-2 text-[10px] md:text-xs uppercase tracking-widest">Roman</TabsTrigger>
+                {poem.hindi && <TabsTrigger value="hindi" className="rounded-full px-4 md:px-6 py-1.5 md:py-2 text-[10px] md:text-xs uppercase tracking-widest">Hindi</TabsTrigger>}
+                {poem.urdu && <TabsTrigger value="urdu" className="rounded-full px-4 md:px-6 py-1.5 md:py-2 text-[10px] md:text-xs uppercase tracking-widest">Urdu</TabsTrigger>}
               </TabsList>
             </div>
 
             <TabsContent value="roman">
-              <article className="reading-container">
-                <div className="font-headline text-xl md:text-2xl leading-[1.8] md:leading-[2] whitespace-pre-line text-foreground/90 font-medium text-center">
+              <article className="reading-container px-2">
+                <div className="font-headline text-lg sm:text-xl md:text-2xl leading-[1.8] md:leading-[2] whitespace-pre-line text-foreground/90 font-medium text-center">
                   {poem.roman}
                 </div>
               </article>
@@ -167,8 +167,8 @@ export function PoemClient({ initialPoem: poem }: PoemClientProps) {
             
             {poem.hindi && (
               <TabsContent value="hindi">
-                <article className="reading-container">
-                  <div className="font-headline text-xl md:text-2xl leading-[1.8] md:leading-[2] whitespace-pre-line text-foreground/90 font-medium text-center">
+                <article className="reading-container px-2">
+                  <div className="font-headline text-lg sm:text-xl md:text-2xl leading-[1.8] md:leading-[2] whitespace-pre-line text-foreground/90 font-medium text-center">
                     {poem.hindi}
                   </div>
                 </article>
@@ -177,8 +177,8 @@ export function PoemClient({ initialPoem: poem }: PoemClientProps) {
 
             {poem.urdu && (
               <TabsContent value="urdu">
-                <article className="reading-container">
-                  <div className="font-headline text-xl md:text-2xl leading-[1.8] md:leading-[2] whitespace-pre-line text-foreground/90 font-medium text-center dir-rtl">
+                <article className="reading-container px-2">
+                  <div className="font-headline text-lg sm:text-xl md:text-2xl leading-[1.8] md:leading-[2] whitespace-pre-line text-foreground/90 font-medium text-center dir-rtl">
                     {poem.urdu}
                   </div>
                 </article>
@@ -186,22 +186,22 @@ export function PoemClient({ initialPoem: poem }: PoemClientProps) {
             )}
           </Tabs>
 
-          <Separator className="bg-border/30 max-w-[100px] mx-auto" />
+          <Separator className="bg-border/30 max-w-[80px] md:max-w-[100px] mx-auto" />
 
           {/* About this Fragment Section */}
-          <section className="space-y-6 max-w-2xl mx-auto">
+          <section className="space-y-4 md:space-y-6 max-w-2xl mx-auto px-2">
             <div className="flex items-center space-x-3 text-primary/70">
               <Info className="w-4 h-4" />
-              <h3 className="text-xs uppercase tracking-[0.2em] font-medium">About this Fragment</h3>
+              <h3 className="text-[10px] md:text-xs uppercase tracking-[0.2em] font-medium">About this Fragment</h3>
             </div>
             <div className="space-y-4">
-              <p className="text-lg font-light leading-relaxed text-muted-foreground italic">
+              <p className="text-base md:text-lg font-light leading-relaxed text-muted-foreground italic">
                 {poem.description}
               </p>
               {poem.emotional_engine && (
-                <div className="pt-4 border-l-2 border-primary/10 pl-6">
-                  <p className="text-sm font-light text-muted-foreground/80 leading-relaxed">
-                    <span className="text-[10px] uppercase tracking-widest text-primary/40 block mb-1">Emotional Echo</span>
+                <div className="pt-4 border-l-2 border-primary/10 pl-4 md:pl-6">
+                  <p className="text-xs md:text-sm font-light text-muted-foreground/80 leading-relaxed">
+                    <span className="text-[9px] md:text-[10px] uppercase tracking-widest text-primary/40 block mb-1">Emotional Echo</span>
                     {poem.emotional_engine}
                   </p>
                 </div>
@@ -210,17 +210,17 @@ export function PoemClient({ initialPoem: poem }: PoemClientProps) {
           </section>
 
           {/* AI Insight Section */}
-          <section className="space-y-8 pt-8 max-w-3xl mx-auto">
+          <section className="space-y-8 pt-6 md:pt-8 max-w-3xl mx-auto px-2">
             {!insight ? (
               <div className="flex flex-col items-center space-y-6">
-                <p className="text-sm text-muted-foreground text-center italic max-w-sm">
+                <p className="text-xs md:text-sm text-muted-foreground text-center italic max-w-xs md:max-w-sm">
                   Wish to explore the deeper resonance and emotional colors of this verse?
                 </p>
                 <Button
                   onClick={handleAnalyze}
                   disabled={analyzing}
                   variant="outline"
-                  className="rounded-full px-8 py-6 border-primary/30 hover:border-primary text-primary/90 hover:bg-primary/5 group"
+                  className="rounded-full px-6 md:px-8 py-5 md:py-6 border-primary/30 hover:border-primary text-primary/90 hover:bg-primary/5 group h-auto"
                 >
                   {analyzing ? (
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -234,23 +234,23 @@ export function PoemClient({ initialPoem: poem }: PoemClientProps) {
               <motion.div
                 initial={{ opacity: 0, scale: 0.98 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="bg-card/30 border border-primary/10 rounded-3xl p-8 md:p-12 space-y-10"
+                className="bg-card/30 border border-primary/10 rounded-2xl md:rounded-3xl p-6 md:p-12 space-y-8 md:space-y-10"
               >
                 <div className="flex items-center space-x-2 text-primary">
-                  <Sparkles className="w-5 h-5" />
-                  <h3 className="text-sm tracking-widest uppercase font-medium">Literary Insight</h3>
+                  <Sparkles className="w-4 h-4 md:w-5 md:h-5" />
+                  <h3 className="text-[10px] md:text-sm tracking-widest uppercase font-medium">Literary Insight</h3>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-12">
-                  <div className="space-y-4">
-                    <h4 className="text-[10px] text-muted-foreground font-medium uppercase tracking-[0.2em]">Thematic Essence</h4>
-                    <p className="text-base leading-relaxed text-foreground/80 font-light">
+                <div className="grid md:grid-cols-2 gap-8 md:gap-12">
+                  <div className="space-y-3 md:space-y-4">
+                    <h4 className="text-[9px] md:text-[10px] text-muted-foreground font-medium uppercase tracking-[0.2em]">Thematic Essence</h4>
+                    <p className="text-sm md:text-base leading-relaxed text-foreground/80 font-light">
                       {insight.thematicAnalysis}
                     </p>
                   </div>
-                  <div className="space-y-4">
-                    <h4 className="text-[10px] text-muted-foreground font-medium uppercase tracking-[0.2em]">Emotional Resonance</h4>
-                    <p className="text-base leading-relaxed text-foreground/80 font-light italic">
+                  <div className="space-y-3 md:space-y-4">
+                    <h4 className="text-[9px] md:text-[10px] text-muted-foreground font-medium uppercase tracking-[0.2em]">Emotional Resonance</h4>
+                    <p className="text-sm md:text-base leading-relaxed text-foreground/80 font-light italic">
                       {insight.emotionalSummary}
                     </p>
                   </div>
@@ -259,34 +259,34 @@ export function PoemClient({ initialPoem: poem }: PoemClientProps) {
             )}
           </section>
 
-          <Separator className="bg-border/30 max-w-[100px] mx-auto" />
+          <Separator className="bg-border/30 max-w-[80px] md:max-w-[100px] mx-auto" />
 
           {/* Public Reflections Section */}
-          <section className="space-y-12 max-w-3xl mx-auto pt-12">
+          <section className="space-y-10 md:space-y-12 max-w-3xl mx-auto pt-8 md:pt-12 px-2">
             <header className="space-y-2 text-center">
               <div className="flex items-center justify-center space-x-3 text-primary/70 mb-2">
                 <MessageCircle className="w-4 h-4" />
-                <h2 className="text-sm uppercase tracking-[0.3em] font-medium">Public Reflections</h2>
+                <h2 className="text-[10px] md:text-sm uppercase tracking-[0.3em] font-medium">Public Reflections</h2>
               </div>
-              <p className="text-xs text-muted-foreground font-light">Share your own resonance with these words.</p>
+              <p className="text-[10px] md:text-xs text-muted-foreground font-light">Share your own resonance with these words.</p>
             </header>
 
             {/* Review Form */}
-            <Card className="bg-card/20 border-border/40 rounded-3xl overflow-hidden">
-              <CardContent className="p-8">
-                <form onSubmit={handleReviewSubmit} className="space-y-8">
-                  <div className="grid md:grid-cols-2 gap-8">
+            <Card className="bg-card/20 border-border/40 rounded-2xl md:rounded-3xl overflow-hidden">
+              <CardContent className="p-6 md:p-8">
+                <form onSubmit={handleReviewSubmit} className="space-y-6 md:space-y-8">
+                  <div className="grid sm:grid-cols-2 gap-6 md:gap-8">
                     <div className="space-y-3">
-                      <label className="text-[10px] uppercase tracking-widest text-muted-foreground ml-1">Name</label>
+                      <label className="text-[9px] md:text-[10px] uppercase tracking-widest text-muted-foreground ml-1">Name</label>
                       <Input 
                         placeholder=""
                         value={newReview.name}
                         onChange={(e) => setNewReview({...newReview, name: e.target.value})}
-                        className="bg-background/40 border-border/50 rounded-xl focus:border-primary/50"
+                        className="bg-background/40 border-border/50 rounded-xl focus:border-primary/50 text-sm h-10 md:h-11"
                       />
                     </div>
                     <div className="space-y-3">
-                      <label className="text-[10px] uppercase tracking-widest text-muted-foreground ml-1">Rating</label>
+                      <label className="text-[9px] md:text-[10px] uppercase tracking-widest text-muted-foreground ml-1">Rating</label>
                       <div className="flex gap-2">
                         {[1, 2, 3, 4, 5].map((star) => (
                           <button
@@ -296,7 +296,7 @@ export function PoemClient({ initialPoem: poem }: PoemClientProps) {
                             className="focus:outline-none transition-transform active:scale-90"
                           >
                             <Star 
-                              className={`w-6 h-6 transition-colors ${
+                              className={`w-5 h-5 md:w-6 md:h-6 transition-colors ${
                                 star <= newReview.rating ? 'text-primary fill-primary' : 'text-muted-foreground/30'
                               }`} 
                             />
@@ -306,18 +306,18 @@ export function PoemClient({ initialPoem: poem }: PoemClientProps) {
                     </div>
                   </div>
                   <div className="space-y-3">
-                    <label className="text-[10px] uppercase tracking-widest text-muted-foreground ml-1">Reflection</label>
+                    <label className="text-[9px] md:text-[10px] uppercase tracking-widest text-muted-foreground ml-1">Reflection</label>
                     <Textarea 
                       placeholder=""
                       value={newReview.comment}
                       onChange={(e) => setNewReview({...newReview, comment: e.target.value})}
-                      className="min-h-[120px] bg-background/40 border-border/50 rounded-2xl focus:border-primary/50 resize-none font-light"
+                      className="min-h-[100px] md:min-h-[120px] bg-background/40 border-border/50 rounded-xl md:rounded-2xl focus:border-primary/50 resize-none font-light text-sm"
                     />
                   </div>
                   <Button 
                     type="submit" 
                     disabled={submittingReview}
-                    className="w-full md:w-auto rounded-full px-8 py-6 bg-primary text-primary-foreground hover:bg-primary/90 group"
+                    className="w-full md:w-auto rounded-full px-8 py-5 md:py-6 bg-primary text-primary-foreground hover:bg-primary/90 group h-auto"
                   >
                     {submittingReview ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Send className="w-4 h-4 mr-2" />}
                     Leave Reflection
@@ -327,17 +327,17 @@ export function PoemClient({ initialPoem: poem }: PoemClientProps) {
             </Card>
 
             {/* Reviews List */}
-            <div className="space-y-8">
+            <div className="space-y-6 md:space-y-8">
               {reviews.length > 0 && (
-                <h3 className="text-xl font-headline text-center mb-8">Reviews</h3>
+                <h3 className="text-lg md:text-xl font-headline text-center mb-6 md:mb-8">Reviews</h3>
               )}
               
               {loadingReviews ? (
-                <div className="flex justify-center py-12">
-                  <Loader2 className="w-6 h-6 text-primary animate-spin" />
+                <div className="flex justify-center py-10 md:py-12">
+                  <Loader2 className="w-5 h-5 md:w-6 md:h-6 text-primary animate-spin" />
                 </div>
               ) : reviews.length > 0 ? (
-                <div className="grid gap-6">
+                <div className="grid gap-4 md:gap-6">
                   <AnimatePresence mode="popLayout">
                     {reviews.map((review, idx) => (
                       <motion.div
@@ -346,25 +346,25 @@ export function PoemClient({ initialPoem: poem }: PoemClientProps) {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: idx * 0.1 }}
                       >
-                        <Card className="bg-card/10 border-border/30 border-dashed rounded-2xl">
-                          <CardHeader className="flex flex-row items-center justify-between p-6 pb-2">
+                        <Card className="bg-card/10 border-border/30 border-dashed rounded-xl md:rounded-2xl">
+                          <CardHeader className="flex flex-row items-center justify-between p-4 md:p-6 pb-2">
                             <div className="space-y-1">
-                              <CardTitle className="text-sm font-medium">{review.name}</CardTitle>
+                              <CardTitle className="text-xs md:text-sm font-medium">{review.name}</CardTitle>
                               <div className="flex gap-1">
                                 {[...Array(5)].map((_, i) => (
                                   <Star 
                                     key={i} 
-                                    className={`w-3 h-3 ${i < review.rating ? 'text-primary fill-primary' : 'text-muted-foreground/20'}`} 
+                                    className={`w-2.5 h-2.5 md:w-3 md:h-3 ${i < review.rating ? 'text-primary fill-primary' : 'text-muted-foreground/20'}`} 
                                   />
                                 ))}
                               </div>
                             </div>
-                            <time className="text-[10px] text-muted-foreground tracking-widest uppercase">
+                            <time className="text-[8px] md:text-[10px] text-muted-foreground tracking-widest uppercase">
                               {review.created_at ? format(new Date(review.created_at), 'MMM d, yyyy') : ''}
                             </time>
                           </CardHeader>
-                          <CardContent className="p-6 pt-2">
-                            <p className="text-sm text-foreground/70 font-light italic leading-relaxed">
+                          <CardContent className="p-4 md:p-6 pt-2">
+                            <p className="text-xs md:text-sm text-foreground/70 font-light italic leading-relaxed">
                               "{review.comment}"
                             </p>
                           </CardContent>
@@ -374,8 +374,8 @@ export function PoemClient({ initialPoem: poem }: PoemClientProps) {
                   </AnimatePresence>
                 </div>
               ) : (
-                <div className="text-center py-12 border border-dashed border-border/30 rounded-3xl">
-                  <p className="text-xs text-muted-foreground font-light tracking-widest italic">
+                <div className="text-center py-10 md:py-12 border border-dashed border-border/30 rounded-2xl">
+                  <p className="text-[10px] md:text-xs text-muted-foreground font-light tracking-widest italic">
                     The silence here awaits your reflection.
                   </p>
                 </div>
@@ -385,8 +385,8 @@ export function PoemClient({ initialPoem: poem }: PoemClientProps) {
         </motion.div>
       </main>
 
-      <footer className="max-w-4xl mx-auto px-6 py-20 text-center opacity-30 mt-20">
-        <p className="text-[10px] tracking-[0.5em] uppercase">Rukshar's Archive &copy; {new Date().getFullYear()}</p>
+      <footer className="max-w-4xl mx-auto px-6 py-12 md:py-20 text-center opacity-30 mt-12 md:mt-20">
+        <p className="text-[8px] md:text-[10px] tracking-[0.5em] uppercase">Rukshar's Archive &copy; {new Date().getFullYear()}</p>
       </footer>
     </div>
   );
