@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -33,7 +32,7 @@ export default function PoemPage() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
   const [newReview, setNewReview] = useState({
-    user_name: '',
+    name: '',
     rating: 0,
     comment: ''
   });
@@ -78,9 +77,9 @@ export default function PoemPage() {
 
   const handleReviewSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newReview.user_name || !newReview.comment || newReview.rating === 0) {
+    if (!newReview.name || !newReview.comment || newReview.rating === 0) {
       toast({
-        title: "Fragment missing",
+        title: "Information required",
         description: "Please provide your name, a rating, and your reflection."
       });
       return;
@@ -95,7 +94,7 @@ export default function PoemPage() {
       
       const updatedReviews = await fetchReviews(id as string);
       setReviews(updatedReviews);
-      setNewReview({ user_name: '', rating: 0, comment: '' });
+      setNewReview({ name: '', rating: 0, comment: '' });
       
       toast({
         title: "Reflection saved",
@@ -304,11 +303,11 @@ export default function PoemPage() {
                 <form onSubmit={handleReviewSubmit} className="space-y-8">
                   <div className="grid md:grid-cols-2 gap-8">
                     <div className="space-y-3">
-                      <label className="text-[10px] uppercase tracking-widest text-muted-foreground ml-1">Your Name</label>
+                      <label className="text-[10px] uppercase tracking-widest text-muted-foreground ml-1">Name</label>
                       <Input 
                         placeholder=""
-                        value={newReview.user_name}
-                        onChange={(e) => setNewReview({...newReview, user_name: e.target.value})}
+                        value={newReview.name}
+                        onChange={(e) => setNewReview({...newReview, name: e.target.value})}
                         className="bg-background/40 border-border/50 rounded-xl focus:border-primary/50"
                       />
                     </div>
@@ -333,7 +332,7 @@ export default function PoemPage() {
                     </div>
                   </div>
                   <div className="space-y-3">
-                    <label className="text-[10px] uppercase tracking-widest text-muted-foreground ml-1">Your Reflection</label>
+                    <label className="text-[10px] uppercase tracking-widest text-muted-foreground ml-1">Reflection</label>
                     <Textarea 
                       placeholder=""
                       value={newReview.comment}
@@ -376,7 +375,7 @@ export default function PoemPage() {
                         <Card className="bg-card/10 border-border/30 border-dashed rounded-2xl">
                           <CardHeader className="flex flex-row items-center justify-between p-6 pb-2">
                             <div className="space-y-1">
-                              <CardTitle className="text-sm font-medium">{review.user_name}</CardTitle>
+                              <CardTitle className="text-sm font-medium">{review.name}</CardTitle>
                               <div className="flex gap-1">
                                 {[...Array(5)].map((_, i) => (
                                   <Star 

@@ -84,7 +84,7 @@ export const fetchReviews = async (poemId: string): Promise<Review[]> => {
 
     if (error) {
       if (status === 404) {
-        console.warn("Table 'poem_reviews' not found. Reflections will be hidden until the table is created in Supabase.");
+        console.warn("Table 'poem_reviews' not found.");
       } else {
         console.error("fetchReviews Error:", error.message, error.hint || '');
       }

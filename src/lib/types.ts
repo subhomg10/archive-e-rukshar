@@ -15,7 +15,7 @@ export interface Poem {
 export interface Review {
   id: string;
   poem_id: string;
-  user_name: string;
+  name: string;
   rating: number;
   comment: string;
   created_at: string;
