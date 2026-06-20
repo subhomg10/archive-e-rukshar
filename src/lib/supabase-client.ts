@@ -30,7 +30,6 @@ export const fetchPoems = async (filter?: { theme?: string; search?: string }): 
 
 /**
  * Fetches a single poem by ID.
- * Uses maybeSingle() to avoid coercion errors when 0 rows are found.
  */
 export const fetchPoemById = async (id: string): Promise<Poem | null> => {
   const { data, error } = await supabase
@@ -75,9 +74,36 @@ export const fetchFeaturedPoems = async (): Promise<Poem[]> => {
   return (response.data || []) as Poem[];
 };
 
+export const fetchArchiveStats = async () => {
+  try {
+    const [poemsCount, featuredCount, reviewsCount, themesData] = await Promise.all([
+      supabase.from('poems').select('*', { count: 'exact', head: true }),
+      supabase.from('poems').select('*', { count: 'exact', head: true }).eq('featured', true),
+      supabase.from('reviews').select('*', { count: 'exact', head: true }),
+      supabase.from('poems').select('theme')
+    ]);
+
+    const uniqueThemes = new Set(themesData.data?.map(p => p.theme)).size;
+
+    return {
+      totalPoems: poemsCount.count || 0,
+      featuredPoems: featuredCount.count || 0,
+      totalReviews: reviewsCount.count || 0,
+      totalThemes: uniqueThemes
+    };
+  } catch (err) {
+    console.error("Error fetching archive stats:", err);
+    return {
+      totalPoems: 0,
+      featuredPoems: 0,
+      totalReviews: 0,
+      totalThemes: 0
+    };
+  }
+};
+
 /**
  * Reviews fetching and submission
- * Uses 'reviews' table as suggested by previous schema errors.
  */
 export const fetchReviews = async (poemId: string): Promise<Review[]> => {
   try {

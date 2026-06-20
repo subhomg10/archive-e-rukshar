@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react';
 import { Navigation } from '@/components/Navigation';
 import { PoemCard } from '@/components/PoemCard';
+import { ArchiveStats } from '@/components/ArchiveStats';
 import { Poem } from '@/lib/types';
-import { fetchPoems, fetchThemes, fetchFeaturedPoems } from '@/lib/supabase-client';
+import { fetchPoems, fetchThemes, fetchFeaturedPoems, fetchArchiveStats } from '@/lib/supabase-client';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, Loader2, AlertCircle, Star } from 'lucide-react';
@@ -16,6 +17,12 @@ export default function ArchivePage() {
   const [poems, setPoems] = useState<Poem[]>([]);
   const [featuredPoems, setFeaturedPoems] = useState<Poem[]>([]);
   const [themes, setThemes] = useState<string[]>([]);
+  const [stats, setStats] = useState({
+    totalPoems: 0,
+    totalThemes: 0,
+    featuredPoems: 0,
+    totalReviews: 0
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTheme, setActiveTheme] = useState<string | null>(null);
@@ -26,15 +33,17 @@ export default function ArchivePage() {
       setLoading(true);
       setError(null);
       try {
-        const [themeData, featuredData, allData] = await Promise.all([
+        const [themeData, featuredData, allData, statsData] = await Promise.all([
           fetchThemes(),
           fetchFeaturedPoems(),
-          fetchPoems({ theme: activeTheme || undefined, search: searchQuery })
+          fetchPoems({ theme: activeTheme || undefined, search: searchQuery }),
+          fetchArchiveStats()
         ]);
         
         setThemes(themeData);
         setFeaturedPoems(featuredData);
         setPoems(allData);
+        setStats(statsData);
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -57,6 +66,16 @@ export default function ArchivePage() {
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
+
+        {/* Stats Section */}
+        <section className="space-y-4">
+          <header className="flex items-center space-x-3 mb-6">
+            <div className="h-px bg-border/50 flex-1" />
+            <span className="text-[10px] tracking-[0.4em] uppercase text-muted-foreground font-light">Archive Statistics</span>
+            <div className="h-px bg-border/50 flex-1" />
+          </header>
+          <ArchiveStats stats={stats} />
+        </section>
 
         {/* Featured Section */}
         {featuredPoems.length > 0 && (
