@@ -6,7 +6,7 @@ import { Poem } from '@/lib/types';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, ArrowRight, Star } from 'lucide-react';
-import { format } from 'date-fns';
+import { format, isValid } from 'date-fns';
 
 interface PoemCardProps {
   poem: Poem;
@@ -16,12 +16,11 @@ interface PoemCardProps {
 export function PoemCard({ poem, index }: PoemCardProps) {
   // Gracefully handle potentially missing or invalid dates
   let formattedDate = "Recently";
-  try {
-    if (poem.date) {
-      formattedDate = format(new Date(poem.date), 'MMM d, yyyy');
+  if (poem.date) {
+    const date = new Date(poem.date);
+    if (isValid(date)) {
+      formattedDate = format(date, 'MMM d, yyyy');
     }
-  } catch (e) {
-    console.error("Invalid date for poem:", poem.id);
   }
 
   return (
