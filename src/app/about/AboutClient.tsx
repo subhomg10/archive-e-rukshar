@@ -124,7 +124,7 @@ export function AboutClient() {
           {/* Closing Note */}
           <motion.section variants={itemVariants} className="pt-20 text-center space-y-8">
             <div className="h-px bg-gradient-to-r from-transparent via-border/50 to-transparent w-full" />
-            <p className="font-headline italic text-2xl md:text-3xl text-foreground/80 max-w-2xl mx-auto leading-relaxed">
+            <p className="font-headline italic text-xl md:text-3xl text-foreground/80 max-w-none mx-auto leading-relaxed whitespace-nowrap">
               "I do not write about objects. I write about the lives they witness."
             </p>
             <p className="text-[10px] tracking-[0.5em] uppercase text-muted-foreground/50">— Rukshar</p>
