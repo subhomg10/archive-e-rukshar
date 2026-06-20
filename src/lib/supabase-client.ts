@@ -28,12 +28,16 @@ export const fetchPoems = async (filter?: { theme?: string; search?: string }): 
   return (response.data || []) as Poem[];
 };
 
+/**
+ * Fetches a single poem by ID.
+ * Uses maybeSingle() to avoid coercion errors when 0 rows are found.
+ */
 export const fetchPoemById = async (id: string): Promise<Poem | null> => {
   const { data, error } = await supabase
     .from('poems')
     .select('*')
     .eq('id', id)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error(`fetchPoemById Error:`, error.message);
@@ -73,11 +77,11 @@ export const fetchFeaturedPoems = async (): Promise<Poem[]> => {
 
 /**
  * Reviews fetching and submission
- * Updated to use 'reviews' table as suggested by the database schema hint.
+ * Uses 'reviews' table as suggested by previous schema errors.
  */
 export const fetchReviews = async (poemId: string): Promise<Review[]> => {
   try {
-    const { data, error, status } = await supabase
+    const { data, error } = await supabase
       .from('reviews')
       .select('*')
       .eq('poem_id', poemId)

@@ -33,7 +33,7 @@ export function PoemCard({ poem, index }: PoemCardProps) {
                 <div className="flex flex-wrap gap-2 flex-1 min-w-0">
                   <Badge 
                     variant="outline" 
-                    className="text-[10px] uppercase tracking-widest border-primary/20 text-primary/80 font-normal py-0.5"
+                    className="text-[10px] uppercase tracking-widest border-primary/20 text-primary/80 font-normal py-0.5 whitespace-normal text-left"
                   >
                     {poem.theme}
                   </Badge>
