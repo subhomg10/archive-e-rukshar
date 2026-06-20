@@ -28,25 +28,26 @@ export function PoemCard({ poem, index }: PoemCardProps) {
       <Link href={`/poem/${poem.id}`}>
         <Card className="h-full bg-card/40 border-border/40 overflow-hidden transition-all duration-300 group-hover:border-primary/30 group-hover:shadow-[0_0_20px_-5px_rgba(201,178,143,0.1)] group-hover:bg-card/60">
           <CardHeader className="p-6">
-            <div className="flex justify-between items-start gap-4 mb-2">
-              <div className="flex flex-1 min-w-0 gap-2 overflow-hidden">
-                <Badge 
-                  variant="outline" 
-                  className="text-[10px] uppercase tracking-widest border-primary/20 text-primary/80 font-normal py-0.5 truncate block max-w-full"
-                  title={poem.theme}
-                >
-                  {poem.theme}
-                </Badge>
-                {poem.featured && (
-                  <Badge variant="secondary" className="text-[10px] uppercase tracking-widest bg-primary/10 text-primary font-normal py-0.5 border-none shrink-0">
-                    <Star className="w-2.5 h-2.5 mr-1 fill-primary" />
-                    Feat
+            <div className="flex flex-col gap-4 mb-2">
+              <div className="flex justify-between items-start gap-4">
+                <div className="flex flex-wrap gap-2 flex-1 min-w-0">
+                  <Badge 
+                    variant="outline" 
+                    className="text-[10px] uppercase tracking-widest border-primary/20 text-primary/80 font-normal py-0.5"
+                  >
+                    {poem.theme}
                   </Badge>
-                )}
-              </div>
-              <div className="flex items-center text-[10px] text-muted-foreground uppercase tracking-widest font-body shrink-0 whitespace-nowrap">
-                <Calendar className="w-3 h-3 mr-1" />
-                {poem.date}
+                  {poem.featured && (
+                    <Badge variant="secondary" className="text-[10px] uppercase tracking-widest bg-primary/10 text-primary font-normal py-0.5 border-none shrink-0">
+                      <Star className="w-2.5 h-2.5 mr-1 fill-primary" />
+                      Featured
+                    </Badge>
+                  )}
+                </div>
+                <div className="flex items-center text-[10px] text-muted-foreground uppercase tracking-widest font-body shrink-0 whitespace-nowrap mt-1">
+                  <Calendar className="w-3 h-3 mr-1" />
+                  {poem.date}
+                </div>
               </div>
             </div>
             <CardTitle className="font-headline text-2xl group-hover:text-primary transition-colors duration-300 leading-tight">
