@@ -5,12 +5,11 @@ import { useRouter } from 'next/navigation';
 import { Navigation } from '@/components/Navigation';
 import { Poem, Review } from '@/lib/types';
 import { fetchReviews, addReview } from '@/lib/supabase-client';
-import { analyzePoem, AnalyzePoemOutput } from '@/ai/flows/ai-poem-analysis';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Sparkles, ChevronLeft, Loader2, Star, Send, MessageCircle, Info } from 'lucide-react';
+import { ChevronLeft, Loader2, Star, Send, MessageCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -25,9 +24,6 @@ interface PoemClientProps {
 export function PoemClient({ initialPoem: poem }: PoemClientProps) {
   const router = useRouter();
   const { toast } = useToast();
-  
-  const [analyzing, setAnalyzing] = useState(false);
-  const [insight, setInsight] = useState<AnalyzePoemOutput | null>(null);
   
   // Review State
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -53,23 +49,6 @@ export function PoemClient({ initialPoem: poem }: PoemClientProps) {
     };
     loadReviews();
   }, [poem.id]);
-
-  const handleAnalyze = async () => {
-    setAnalyzing(true);
-    try {
-      const result = await analyzePoem({ title: poem.title, poemText: poem.roman });
-      setInsight(result);
-    } catch (error) {
-      console.error('Analysis failed', error);
-      toast({
-        variant: "destructive",
-        title: "Analysis Failed",
-        description: "The archive's muse is momentarily silent. Please try again."
-      });
-    } finally {
-      setAnalyzing(false);
-    }
-  };
 
   const handleReviewSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -207,56 +186,6 @@ export function PoemClient({ initialPoem: poem }: PoemClientProps) {
                 </div>
               )}
             </div>
-          </section>
-
-          {/* AI Insight Section */}
-          <section className="space-y-8 pt-6 md:pt-8 max-w-3xl mx-auto px-2">
-            {!insight ? (
-              <div className="flex flex-col items-center space-y-6">
-                <p className="text-xs md:text-sm text-muted-foreground text-center italic max-w-xs md:max-w-sm">
-                  Wish to explore the deeper resonance and emotional colors of this verse?
-                </p>
-                <Button
-                  onClick={handleAnalyze}
-                  disabled={analyzing}
-                  variant="outline"
-                  className="rounded-full px-6 md:px-8 py-5 md:py-6 border-primary/30 hover:border-primary text-primary/90 hover:bg-primary/5 group h-auto"
-                >
-                  {analyzing ? (
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  ) : (
-                    <Sparkles className="w-4 h-4 mr-2 group-hover:rotate-12 transition-transform" />
-                  )}
-                  {analyzing ? 'Consulting the Muse...' : 'Reveal AI Insight'}
-                </Button>
-              </div>
-            ) : (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="bg-card/30 border border-primary/10 rounded-2xl md:rounded-3xl p-6 md:p-12 space-y-8 md:space-y-10"
-              >
-                <div className="flex items-center space-x-2 text-primary">
-                  <Sparkles className="w-4 h-4 md:w-5 md:h-5" />
-                  <h3 className="text-[10px] md:text-sm tracking-widest uppercase font-medium">Literary Insight</h3>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-8 md:gap-12">
-                  <div className="space-y-3 md:space-y-4">
-                    <h4 className="text-[9px] md:text-[10px] text-muted-foreground font-medium uppercase tracking-[0.2em]">Thematic Essence</h4>
-                    <p className="text-sm md:text-base leading-relaxed text-foreground/80 font-light">
-                      {insight.thematicAnalysis}
-                    </p>
-                  </div>
-                  <div className="space-y-3 md:space-y-4">
-                    <h4 className="text-[9px] md:text-[10px] text-muted-foreground font-medium uppercase tracking-[0.2em]">Emotional Resonance</h4>
-                    <p className="text-sm md:text-base leading-relaxed text-foreground/80 font-light italic">
-                      {insight.emotionalSummary}
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-            )}
           </section>
 
           <Separator className="bg-border/30 max-w-[80px] md:max-w-[100px] mx-auto" />
