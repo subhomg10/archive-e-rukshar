@@ -8,9 +8,10 @@ import { fetchPoemById } from '@/lib/supabase-client';
 import { analyzePoem, AnalyzePoemOutput } from '@/ai/flows/ai-poem-analysis';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Sparkles, ChevronLeft, Loader2, Quote } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Sparkles, ChevronLeft, Loader2, Languages } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function PoemPage() {
   const { id } = useParams();
@@ -33,7 +34,7 @@ export default function PoemPage() {
     if (!poem) return;
     setAnalyzing(true);
     try {
-      const result = await analyzePoem({ title: poem.title, poemText: poem.content });
+      const result = await analyzePoem({ title: poem.title, poemText: poem.roman });
       setInsight(result);
     } catch (error) {
       console.error('Analysis failed', error);
@@ -96,12 +97,44 @@ export default function PoemPage() {
 
           <Separator className="bg-border/30 max-w-[100px] mx-auto" />
 
-          {/* Poem Content */}
-          <article className="reading-container">
-            <div className="font-headline text-xl md:text-2xl leading-[1.8] md:leading-[2] whitespace-pre-line text-foreground/90 font-medium">
-              {poem.content}
+          {/* Poem Content Tabs */}
+          <Tabs defaultValue="roman" className="w-full">
+            <div className="flex justify-center mb-8">
+              <TabsList className="bg-card/50 border border-border/50 rounded-full h-auto p-1">
+                <TabsTrigger value="roman" className="rounded-full px-6 py-2 text-xs uppercase tracking-widest">Roman</TabsTrigger>
+                {poem.hindi && <TabsTrigger value="hindi" className="rounded-full px-6 py-2 text-xs uppercase tracking-widest">Hindi</TabsTrigger>}
+                {poem.urdu && <TabsTrigger value="urdu" className="rounded-full px-6 py-2 text-xs uppercase tracking-widest">Urdu</TabsTrigger>}
+              </TabsList>
             </div>
-          </article>
+
+            <TabsContent value="roman">
+              <article className="reading-container">
+                <div className="font-headline text-xl md:text-2xl leading-[1.8] md:leading-[2] whitespace-pre-line text-foreground/90 font-medium text-center">
+                  {poem.roman}
+                </div>
+              </article>
+            </TabsContent>
+            
+            {poem.hindi && (
+              <TabsContent value="hindi">
+                <article className="reading-container">
+                  <div className="font-headline text-xl md:text-2xl leading-[1.8] md:leading-[2] whitespace-pre-line text-foreground/90 font-medium text-center">
+                    {poem.hindi}
+                  </div>
+                </article>
+              </TabsContent>
+            )}
+
+            {poem.urdu && (
+              <TabsContent value="urdu">
+                <article className="reading-container">
+                  <div className="font-headline text-xl md:text-2xl leading-[1.8] md:leading-[2] whitespace-pre-line text-foreground/90 font-medium text-center dir-rtl">
+                    {poem.urdu}
+                  </div>
+                </article>
+              </TabsContent>
+            )}
+          </Tabs>
 
           <Separator className="bg-border/30 max-w-[100px] mx-auto" />
 

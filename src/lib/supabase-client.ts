@@ -1,100 +1,73 @@
-import { Poem, Theme } from './types';
+import { createClient } from '@supabase/supabase-js';
+import { Poem } from './types';
 
-const MOCK_POEMS: Poem[] = [
-  {
-    id: '1',
-    title: 'The Silent Watch',
-    excerpt: 'Between the stars and the shadow of the hill, the world remains remarkably still...',
-    content: `Between the stars and the shadow of the hill,
-the world remains remarkably still.
-A quiet heart, a heavy mind,
-seeking truths we yet must find.
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-In every breath, a story told,
-of ancient wisdom, centuries old.
-The wind whispers through the pines,
-drawing secrets in fragile lines.`,
-    author: 'Rukshar',
-    theme: 'Solitude',
-    publishedAt: '2024-02-20',
-    isFeatured: true,
-  },
-  {
-    id: '2',
-    title: 'Echoes of Spring',
-    excerpt: 'A delicate dance of petals on the breeze, returning life to the dormant trees...',
-    content: `A delicate dance of petals on the breeze,
-returning life to the dormant trees.
-The river hums a melody of old,
-as winter sheds its layers of cold.
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-Gold light spills upon the grass,
-as the seasons slowly pass.
-Every bloom a tiny flame,
-whispering spring's eternal name.`,
-    author: 'Rukshar',
-    theme: 'Nature',
-    publishedAt: '2024-03-15',
-    isFeatured: true,
-  },
-  {
-    id: '3',
-    title: 'Fragmented Memory',
-    excerpt: 'Like dust motes in a beam of light, the past flickers then fades into night...',
-    content: `Like dust motes in a beam of light,
-the past flickers then fades into night.
-A face partially hidden, a song half-sung,
-the bells of yesterday, softly rung.
+export const fetchPoems = async (filter?: { theme?: string; search?: string }): Promise<Poem[]> => {
+  let query = supabase.from('poems').select('*');
 
-We hold the threads of what was once,
-lost in the rhythm of the months.
-Time is a weaver, silent and deep,
-crafting the promises we couldn't keep.`,
-    author: 'Rukshar',
-    theme: 'Memory',
-    publishedAt: '2024-01-10',
-  },
-  {
-    id: '4',
-    title: 'The Unspoken Hour',
-    excerpt: 'When words fail and only silence speaks, finding the solace every wanderer seeks...',
-    content: `When words fail and only silence speaks,
-finding the solace every wanderer seeks.
-The ink is dry, the page is white,
-waiting for the morning light.
-
-In the hollow of the dark,
-we search for a singular spark.
-To define the undefined,
-in the sanctuary of the mind.`,
-    author: 'Rukshar',
-    theme: 'Identity',
-    publishedAt: '2024-04-01',
-  }
-];
-
-export const fetchPoems = async (filter?: { theme?: Theme; search?: string }): Promise<Poem[]> => {
-  // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 300));
-  
-  let poems = [...MOCK_POEMS];
-  
   if (filter?.theme) {
-    poems = poems.filter(p => p.theme === filter.theme);
+    query = query.eq('theme', filter.theme);
   }
-  
+
   if (filter?.search) {
-    const search = filter.search.toLowerCase();
-    poems = poems.filter(p => 
-      p.title.toLowerCase().includes(search) || 
-      p.excerpt.toLowerCase().includes(search)
-    );
+    const s = filter.search;
+    // Search across title, theme, emotional_engine, roman, and description
+    query = query.or(`title.ilike.%${s}%,theme.ilike.%${s}%,emotional_engine.ilike.%${s}%,roman.ilike.%${s}%,description.ilike.%${s}%`);
+  }
+
+  const { data, error } = await query.order('date', { ascending: false });
+  
+  if (error) {
+    throw new Error(`Supabase Query Error: ${error.message}`);
   }
   
-  return poems;
+  return data as Poem[];
 };
 
 export const fetchPoemById = async (id: string): Promise<Poem | null> => {
-  await new Promise(resolve => setTimeout(resolve, 200));
-  return MOCK_POEMS.find(p => p.id === id) || null;
+  const { data, error } = await supabase
+    .from('poems')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error) {
+    console.error(`Error fetching poem ${id}:`, error.message);
+    return null;
+  }
+  
+  return data as Poem;
+};
+
+export const fetchThemes = async (): Promise<string[]> => {
+  const { data, error } = await supabase
+    .from('poems')
+    .select('theme');
+
+  if (error) {
+    console.error('Error fetching themes:', error.message);
+    return [];
+  }
+  
+  const themes = Array.from(new Set(data.map(i => i.theme))).filter(Boolean);
+  return themes;
+};
+
+export const fetchFeaturedPoems = async (): Promise<Poem[]> => {
+  const { data, error } = await supabase
+    .from('poems')
+    .select('*')
+    .eq('featured', true)
+    .order('date', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching featured poems:', error.message);
+    return [];
+  }
+  
+  return data as Poem[];
 };

@@ -1,12 +1,13 @@
-export type Theme = 'Love' | 'Nature' | 'Solitude' | 'Time' | 'Memory' | 'Identity';
-
 export interface Poem {
   id: string;
   title: string;
-  excerpt: string;
-  content: string;
+  theme: string;
+  date: string;
   author: string;
-  theme: Theme;
-  publishedAt: string;
-  isFeatured?: boolean;
+  featured: boolean;
+  roman: string;
+  hindi?: string | null;
+  urdu?: string | null;
+  description: string;
+  emotional_engine?: string | null;
 }
