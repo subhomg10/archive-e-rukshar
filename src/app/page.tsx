@@ -36,7 +36,7 @@ export default function LandingPage() {
             asChild
             variant="outline"
             size="lg"
-            className="rounded-full px-12 py-6 border-primary/20 hover:border-primary/50 text-primary hover:bg-primary/5 transition-all duration-500 text-base font-light tracking-wider"
+            className="rounded-full px-12 py-6 border-primary/20 hover:border-primary/50 text-primary hover:text-primary hover:bg-primary/10 hover:shadow-[0_0_20px_rgba(201,178,143,0.15)] transition-all duration-500 text-base font-light tracking-wider bg-transparent"
           >
             <Link href="/archive">
               Enter the Archive
