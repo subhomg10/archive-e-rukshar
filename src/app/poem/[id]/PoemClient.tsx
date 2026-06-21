@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Navigation } from '@/components/Navigation';
 import { Poem, Review } from '@/lib/types';
@@ -22,6 +22,72 @@ interface PoemClientProps {
   initialPoem: Poem;
 }
 
+/**
+ * InteractivePoem component to handle word-based meanings
+ */
+function InteractivePoem({ text, vocabMap }: { text: string; vocabMap: Map<string, string> }) {
+  const [activeWordId, setActiveWordId] = useState<string | null>(null);
+
+  if (!vocabMap.size) {
+    return <div className="whitespace-pre-line">{text}</div>;
+  }
+
+  // Escape special regex characters
+  const vocabWords = Array.from(vocabMap.keys());
+  const escapedWords = vocabWords.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+  const regex = new RegExp(`(\\b(?:${escapedWords})\\b)`, 'gi');
+
+  const lines = text.split('\n');
+
+  return (
+    <div className="space-y-1">
+      {lines.map((line, lineIdx) => (
+        <div key={`line-${lineIdx}`} className="min-h-[1.5em] leading-[2]">
+          {line.split(regex).map((part, partIdx) => {
+            const lowerPart = part.toLowerCase();
+            const matchingKey = vocabWords.find(w => w.toLowerCase() === lowerPart);
+            
+            if (matchingKey) {
+              const wordId = `word-${lineIdx}-${partIdx}`;
+              const isActive = activeWordId === wordId;
+              const meaning = vocabMap.get(matchingKey);
+
+              return (
+                <span key={wordId} className="relative inline-block align-top">
+                  <button
+                    onClick={() => setActiveWordId(isActive ? null : wordId)}
+                    className={cn(
+                      "font-headline transition-all duration-300 border-b border-dashed border-primary/40 hover:border-primary hover:text-primary decoration-primary underline-offset-4",
+                      isActive ? "text-primary border-primary" : "text-foreground/90"
+                    )}
+                  >
+                    {part}
+                  </button>
+                  <AnimatePresence>
+                    {isActive && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0, y: -5 }}
+                        animate={{ opacity: 1, height: 'auto', y: 0 }}
+                        exit={{ opacity: 0, height: 0, y: -5 }}
+                        className="overflow-hidden w-full text-center"
+                      >
+                        <div className="bg-primary/10 text-primary border-l-2 border-primary/40 px-3 py-1 mt-1 text-sm font-light italic rounded-sm inline-block">
+                          {meaning}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </span>
+              );
+            }
+            return <span key={`part-${lineIdx}-${partIdx}`}>{part}</span>;
+          })}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function PoemClient({ initialPoem: poem }: PoemClientProps) {
   const router = useRouter();
   const { toast } = useToast();
@@ -38,6 +104,23 @@ export function PoemClient({ initialPoem: poem }: PoemClientProps) {
   
   // Vocabulary state
   const [showVocabulary, setShowVocabulary] = useState(false);
+
+  // Interactive Vocabulary Map
+  const vocabMap = useMemo(() => {
+    const map = new Map<string, string>();
+    if (!poem.vocab_words || !poem.vocab_meanings) return map;
+
+    const words = poem.vocab_words.split('|');
+    const meanings = poem.vocab_meanings.split('|');
+
+    words.forEach((word, index) => {
+      if (word && meanings[index]) {
+        map.set(word.trim(), meanings[index].trim());
+      }
+    });
+
+    return map;
+  }, [poem.vocab_words, poem.vocab_meanings]);
 
   useEffect(() => {
     const loadReviews = async () => {
@@ -143,8 +226,8 @@ export function PoemClient({ initialPoem: poem }: PoemClientProps) {
 
             <TabsContent value="roman">
               <article className="reading-container px-2">
-                <div className="font-headline text-lg sm:text-xl md:text-2xl leading-[1.8] md:leading-[2] whitespace-pre-line text-foreground/90 font-medium text-center">
-                  {poem.roman}
+                <div className="font-headline text-lg sm:text-xl md:text-2xl leading-[1.8] md:leading-[2] text-foreground/90 font-medium text-center">
+                  <InteractivePoem text={poem.roman} vocabMap={vocabMap} />
                 </div>
               </article>
             </TabsContent>

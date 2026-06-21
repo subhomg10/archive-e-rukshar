@@ -11,6 +11,8 @@ export interface Poem {
   description: string;
   emotional_engine?: string | null;
   vocabulary?: string | null;
+  vocab_words?: string | null;
+  vocab_meanings?: string | null;
 }
 
 export interface Review {
