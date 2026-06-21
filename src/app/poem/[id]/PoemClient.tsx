@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useMemo } from 'react';
@@ -35,9 +36,13 @@ function InteractivePoem({ text, vocabMap }: { text: string; vocabMap: Map<strin
   // Track words that have already been highlighted in this render
   const seenWords = new Set<string>();
 
+  // Get vocabulary words, sorted by length descending to ensure longer phrases are matched first if applicable
+  const vocabWords = Array.from(vocabMap.keys()).sort((a, b) => b.length - a.length);
+  
   // Escape special regex characters
-  const vocabWords = Array.from(vocabMap.keys());
   const escapedWords = vocabWords.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+  
+  // Use word boundaries \b for exact matches and case-insensitive flag 'i'
   const regex = new RegExp(`(\\b(?:${escapedWords})\\b)`, 'gi');
 
   const lines = text.split('\n');
@@ -48,12 +53,11 @@ function InteractivePoem({ text, vocabMap }: { text: string; vocabMap: Map<strin
         <div key={`line-${lineIdx}`} className="min-h-[1.5em] leading-[2]">
           {line.split(regex).map((part, partIdx) => {
             const lowerPart = part.toLowerCase();
-            const matchingKey = vocabWords.find(w => w.toLowerCase() === lowerPart);
+            const meaning = vocabMap.get(lowerPart);
             
             // Highlight only if it's a vocab word AND it's the first time we're seeing it
-            if (matchingKey && !seenWords.has(lowerPart)) {
+            if (meaning && !seenWords.has(lowerPart)) {
               seenWords.add(lowerPart);
-              const meaning = vocabMap.get(matchingKey);
               return (
                 <Popover key={`pop-${lineIdx}-${partIdx}`}>
                   <PopoverTrigger asChild>
@@ -97,19 +101,21 @@ export function PoemClient({ initialPoem: poem }: PoemClientProps) {
   // Vocabulary state
   const [showVocabulary, setShowVocabulary] = useState(false);
 
-  // Interactive Vocabulary Map
+  // Interactive Vocabulary Map - Normalizes keys to lowercase for reliable matching
   const vocabMap = useMemo(() => {
     const map = new Map<string, string>();
     if (!poem.vocab_words || !poem.vocab_meanings) return map;
 
-    const words = poem.vocab_words.split('|');
-    const meanings = poem.vocab_meanings.split('|');
+    const words = poem.vocab_words.split('|').map(w => w.trim());
+    const meanings = poem.vocab_meanings.split('|').map(m => m.trim());
 
+    // Iterate through words to build the map, handling potential length mismatches safely
     words.forEach((word, index) => {
-      const trimmedWord = word.trim();
-      const trimmedMeaning = meanings[index]?.trim();
-      if (trimmedWord && trimmedMeaning) {
-        map.set(trimmedWord, trimmedMeaning);
+      const lowerWord = word.toLowerCase();
+      const meaning = meanings[index];
+      
+      if (lowerWord && meaning) {
+        map.set(lowerWord, meaning);
       }
     });
 
