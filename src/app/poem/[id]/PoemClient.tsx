@@ -26,12 +26,15 @@ interface PoemClientProps {
 
 /**
  * InteractivePoem component to handle word-based meanings with soft marking and stable layout.
- * Now uses a very subtle solid underline (low-opacity tint) for a clean, reading-first experience.
+ * Underlines only the first occurrence of each vocabulary word to keep the reading experience clean.
  */
 function InteractivePoem({ text, vocabMap }: { text: string; vocabMap: Map<string, string> }) {
   if (!vocabMap.size) {
     return <div className="whitespace-pre-line">{text}</div>;
   }
+
+  // Track words that have already been highlighted in this render
+  const seenWords = new Set<string>();
 
   // Escape special regex characters
   const vocabWords = Array.from(vocabMap.keys());
@@ -48,7 +51,9 @@ function InteractivePoem({ text, vocabMap }: { text: string; vocabMap: Map<strin
             const lowerPart = part.toLowerCase();
             const matchingKey = vocabWords.find(w => w.toLowerCase() === lowerPart);
             
-            if (matchingKey) {
+            // Highlight only if it's a vocab word AND it's the first time we're seeing it
+            if (matchingKey && !seenWords.has(lowerPart)) {
+              seenWords.add(lowerPart);
               const meaning = vocabMap.get(matchingKey);
               return (
                 <Popover key={`pop-${lineIdx}-${partIdx}`}>
