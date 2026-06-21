@@ -26,7 +26,7 @@ interface PoemClientProps {
 
 /**
  * InteractivePoem component to handle word-based meanings with soft marking and stable layout.
- * Now uses slight opacity reduction for a subtle, reading-first experience.
+ * Now uses a very subtle solid underline (low-opacity tint) for a clean, reading-first experience.
  */
 function InteractivePoem({ text, vocabMap }: { text: string; vocabMap: Map<string, string> }) {
   if (!vocabMap.size) {
@@ -53,7 +53,7 @@ function InteractivePoem({ text, vocabMap }: { text: string; vocabMap: Map<strin
               return (
                 <Popover key={`pop-${lineIdx}-${partIdx}`}>
                   <PopoverTrigger asChild>
-                    <span className="cursor-help opacity-80 hover:opacity-100 transition-opacity duration-300">
+                    <span className="cursor-help underline underline-offset-4 decoration-primary/20 hover:decoration-primary/50 transition-colors duration-300">
                       {part}
                     </span>
                   </PopoverTrigger>
