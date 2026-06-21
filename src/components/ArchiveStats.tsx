@@ -36,7 +36,7 @@ export function ArchiveStats({ stats }: ArchiveStatsProps) {
       color: 'text-primary/70'
     },
     { 
-      label: 'Public Reflections', 
+      label: 'Public Impressions', 
       value: stats.totalReviews, 
       icon: MessageSquare,
       color: 'text-primary/60'

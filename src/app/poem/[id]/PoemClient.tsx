@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, useMemo } from 'react';
@@ -137,7 +136,7 @@ export function PoemClient({ initialPoem: poem }: PoemClientProps) {
     if (!newReview.name || !newReview.comment || newReview.rating === 0) {
       toast({
         title: "Information required",
-        description: "Please provide your name, a rating, and your reflection."
+        description: "Please provide your name, a rating, and your impression."
       });
       return;
     }
@@ -154,7 +153,7 @@ export function PoemClient({ initialPoem: poem }: PoemClientProps) {
       setNewReview({ name: '', rating: 0, comment: '' });
       
       toast({
-        title: "Reflection saved",
+        title: "Impression saved",
         description: "Your voice has been added to the archive."
       });
     } catch (error: any) {
@@ -314,12 +313,12 @@ export function PoemClient({ initialPoem: poem }: PoemClientProps) {
 
           <Separator className="bg-border/30 max-w-[80px] md:max-w-[100px] mx-auto" />
 
-          {/* Public Reflections Section */}
+          {/* Public Impressions Section */}
           <section className="space-y-10 md:space-y-12 max-w-3xl mx-auto pt-8 md:pt-12 px-2">
             <header className="space-y-2 text-center">
               <div className="flex items-center justify-center space-x-3 text-primary/70 mb-2">
                 <MessageCircle className="w-4 h-4" />
-                <h2 className="text-[10px] md:text-sm uppercase tracking-[0.3em] font-medium">Public Reflections</h2>
+                <h2 className="text-[10px] md:text-sm uppercase tracking-[0.3em] font-medium">Public Impressions</h2>
               </div>
               <p className="text-[10px] md:text-xs text-muted-foreground font-light">Share your own resonance with these words.</p>
             </header>
@@ -359,7 +358,7 @@ export function PoemClient({ initialPoem: poem }: PoemClientProps) {
                     </div>
                   </div>
                   <div className="space-y-3">
-                    <label className="text-[9px] md:text-[10px] uppercase tracking-widest text-muted-foreground ml-1">Reflection</label>
+                    <label className="text-[9px] md:text-[10px] uppercase tracking-widest text-muted-foreground ml-1">Impression</label>
                     <Textarea 
                       placeholder=""
                       value={newReview.comment}
@@ -373,7 +372,7 @@ export function PoemClient({ initialPoem: poem }: PoemClientProps) {
                     className="w-full md:w-auto rounded-full px-8 py-5 md:py-6 bg-primary text-primary-foreground hover:bg-primary/90 group h-auto"
                   >
                     {submittingReview ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Send className="w-4 h-4 mr-2" />}
-                    Leave Reflection
+                    Leave Impression
                   </Button>
                 </form>
               </CardContent>
@@ -382,7 +381,7 @@ export function PoemClient({ initialPoem: poem }: PoemClientProps) {
             {/* Reviews List */}
             <div className="space-y-6 md:space-y-8">
               {reviews.length > 0 && (
-                <h3 className="text-lg md:text-xl font-headline text-center mb-6 md:mb-8">Reviews</h3>
+                <h3 className="text-lg md:text-xl font-headline text-center mb-6 md:mb-8">Impressions</h3>
               )}
               
               {loadingReviews ? (
@@ -429,7 +428,7 @@ export function PoemClient({ initialPoem: poem }: PoemClientProps) {
               ) : (
                 <div className="text-center py-10 md:py-12 border border-dashed border-border/30 rounded-2xl">
                   <p className="text-[10px] md:text-xs text-muted-foreground font-light tracking-widest italic">
-                    The silence here awaits your reflection.
+                    The silence here awaits your impression.
                   </p>
                 </div>
               )}
