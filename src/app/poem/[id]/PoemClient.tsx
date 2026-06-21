@@ -9,13 +9,14 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { ChevronLeft, Loader2, Star, Send, MessageCircle } from 'lucide-react';
+import { ChevronLeft, Loader2, Star, Send, MessageCircle, BookOpen, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 interface PoemClientProps {
   initialPoem: Poem;
@@ -34,6 +35,9 @@ export function PoemClient({ initialPoem: poem }: PoemClientProps) {
     comment: ''
   });
   const [submittingReview, setSubmittingReview] = useState(false);
+  
+  // Vocabulary state
+  const [showVocabulary, setShowVocabulary] = useState(false);
 
   useEffect(() => {
     const loadReviews = async () => {
@@ -187,6 +191,48 @@ export function PoemClient({ initialPoem: poem }: PoemClientProps) {
               )}
             </div>
           </section>
+
+          {/* Vocabulary Section */}
+          {poem.vocabulary && (
+            <>
+              <Separator className="bg-border/30 max-w-[80px] md:max-w-[100px] mx-auto" />
+              <section className="space-y-4 max-w-2xl mx-auto px-2">
+                <Button
+                  variant="ghost"
+                  onClick={() => setShowVocabulary(!showVocabulary)}
+                  className="w-full flex items-center justify-between py-6 h-auto border border-border/30 rounded-2xl hover:bg-primary/5 transition-all group px-6"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-full bg-primary/5 text-primary/60 group-hover:text-primary transition-colors">
+                      <BookOpen className="w-4 h-4" />
+                    </div>
+                    <span className="text-[10px] md:text-xs uppercase tracking-[0.3em] font-medium text-muted-foreground group-hover:text-foreground transition-colors">
+                      {showVocabulary ? 'Hide Vocabulary' : 'Show Vocabulary'}
+                    </span>
+                  </div>
+                  <div className={cn("transition-transform duration-500", showVocabulary ? "rotate-180" : "")}>
+                    <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                  </div>
+                </Button>
+                <AnimatePresence>
+                  {showVocabulary && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="p-6 md:p-8 rounded-2xl bg-card/10 border border-border/20">
+                        <div className="text-sm md:text-base font-light leading-relaxed text-muted-foreground whitespace-pre-line italic">
+                          {poem.vocabulary}
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </section>
+            </>
+          )}
 
           <Separator className="bg-border/30 max-w-[80px] md:max-w-[100px] mx-auto" />
 

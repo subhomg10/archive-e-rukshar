@@ -10,6 +10,7 @@ export interface Poem {
   urdu?: string | null;
   description: string;
   emotional_engine?: string | null;
+  vocabulary?: string | null;
 }
 
 export interface Review {
