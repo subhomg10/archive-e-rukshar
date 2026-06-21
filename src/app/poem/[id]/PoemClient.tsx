@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useMemo } from 'react';
@@ -17,17 +18,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface PoemClientProps {
   initialPoem: Poem;
 }
 
 /**
- * InteractivePoem component to handle word-based meanings
+ * InteractivePoem component to handle word-based meanings with soft marking and stable layout
  */
 function InteractivePoem({ text, vocabMap }: { text: string; vocabMap: Map<string, string> }) {
-  const [activeWordId, setActiveWordId] = useState<string | null>(null);
-
   if (!vocabMap.size) {
     return <div className="whitespace-pre-line">{text}</div>;
   }
@@ -48,36 +48,23 @@ function InteractivePoem({ text, vocabMap }: { text: string; vocabMap: Map<strin
             const matchingKey = vocabWords.find(w => w.toLowerCase() === lowerPart);
             
             if (matchingKey) {
-              const wordId = `word-${lineIdx}-${partIdx}`;
-              const isActive = activeWordId === wordId;
               const meaning = vocabMap.get(matchingKey);
-
               return (
-                <span key={wordId} className="relative inline-block align-top">
-                  <button
-                    onClick={() => setActiveWordId(isActive ? null : wordId)}
-                    className={cn(
-                      "font-headline transition-all duration-300 border-b border-dashed border-primary/40 hover:border-primary hover:text-primary decoration-primary underline-offset-4",
-                      isActive ? "text-primary border-primary" : "text-foreground/90"
-                    )}
+                <Popover key={`pop-${lineIdx}-${partIdx}`}>
+                  <PopoverTrigger asChild>
+                    <span className="cursor-help bg-primary/[0.08] hover:bg-primary/[0.15] rounded-sm px-1 transition-colors duration-300">
+                      {part}
+                    </span>
+                  </PopoverTrigger>
+                  <PopoverContent 
+                    side="bottom" 
+                    className="w-auto max-w-[240px] p-3 bg-card/95 backdrop-blur-md border-border/50 shadow-xl rounded-xl"
                   >
-                    {part}
-                  </button>
-                  <AnimatePresence>
-                    {isActive && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0, y: -5 }}
-                        animate={{ opacity: 1, height: 'auto', y: 0 }}
-                        exit={{ opacity: 0, height: 0, y: -5 }}
-                        className="overflow-hidden w-full text-center"
-                      >
-                        <div className="bg-primary/10 text-primary border-l-2 border-primary/40 px-3 py-1 mt-1 text-sm font-light italic rounded-sm inline-block">
-                          {meaning}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </span>
+                    <p className="text-xs md:text-sm font-light italic text-primary leading-relaxed">
+                      {meaning}
+                    </p>
+                  </PopoverContent>
+                </Popover>
               );
             }
             return <span key={`part-${lineIdx}-${partIdx}`}>{part}</span>;
@@ -114,8 +101,10 @@ export function PoemClient({ initialPoem: poem }: PoemClientProps) {
     const meanings = poem.vocab_meanings.split('|');
 
     words.forEach((word, index) => {
-      if (word && meanings[index]) {
-        map.set(word.trim(), meanings[index].trim());
+      const trimmedWord = word.trim();
+      const trimmedMeaning = meanings[index]?.trim();
+      if (trimmedWord && trimmedMeaning) {
+        map.set(trimmedWord, trimmedMeaning);
       }
     });
 
@@ -212,7 +201,7 @@ export function PoemClient({ initialPoem: poem }: PoemClientProps) {
             </div>
           </header>
 
-          <Separator className="bg-border/30 max-w-[80px] md:max-w-[100px] mx-auto" />
+          <Separator className="bg-border/30 max-w-[100px] mx-auto" />
 
           {/* Poem Content Tabs */}
           <Tabs defaultValue="roman" className="w-full">
