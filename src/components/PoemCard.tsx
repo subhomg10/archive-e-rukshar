@@ -13,6 +13,9 @@ interface PoemCardProps {
 }
 
 export function PoemCard({ poem, index }: PoemCardProps) {
+  // Split the themes into individual entries
+  const themes = poem.theme ? poem.theme.split(/[|,]+/).map(t => t.trim()).filter(Boolean) : [];
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -31,14 +34,17 @@ export function PoemCard({ poem, index }: PoemCardProps) {
             <div className="flex flex-col gap-4 mb-2">
               <div className="flex justify-between items-start gap-4">
                 <div className="flex flex-wrap gap-2 flex-1 min-w-0">
-                  <Badge 
-                    variant="outline" 
-                    className="text-[10px] uppercase tracking-widest border-primary/20 text-primary/80 font-normal py-0.5 whitespace-normal text-left"
-                  >
-                    {poem.theme}
-                  </Badge>
+                  {themes.map((theme, i) => (
+                    <Badge 
+                      key={i}
+                      variant="outline" 
+                      className="text-[10px] uppercase tracking-widest border-primary/20 text-primary/80 font-normal py-0.5 px-2 w-fit whitespace-nowrap"
+                    >
+                      {theme}
+                    </Badge>
+                  ))}
                   {poem.featured && (
-                    <Badge variant="secondary" className="text-[10px] uppercase tracking-widest bg-primary/10 text-primary font-normal py-0.5 border-none shrink-0">
+                    <Badge variant="secondary" className="text-[10px] uppercase tracking-widest bg-primary/10 text-primary font-normal py-0.5 border-none shrink-0 px-2 w-fit">
                       <Star className="w-2.5 h-2.5 mr-1 fill-primary" />
                       Featured
                     </Badge>

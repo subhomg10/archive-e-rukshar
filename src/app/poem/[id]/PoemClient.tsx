@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, useMemo, useRef } from 'react';
@@ -11,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { ChevronLeft, ChevronRight, Loader2, Star, Send, MessageCircle, BookOpen, ChevronDown, Clock, Library, ArrowRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Loader2, Star, Send, MessageCircle, BookOpen, ChevronDown, Clock } from 'lucide-react';
 import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -29,10 +28,6 @@ interface PoemClientProps {
   allPoems: Poem[];
 }
 
-/**
- * InteractiveWord component to handle word-based meanings.
- * Supports hover on desktop and tap on mobile.
- */
 function InteractiveWord({ word, meaning }: { word: string; meaning: string }) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -72,9 +67,6 @@ function InteractiveWord({ word, meaning }: { word: string; meaning: string }) {
   );
 }
 
-/**
- * InteractivePoem component to handle word-based meanings with soft marking and stable layout.
- */
 function InteractivePoem({ text, vocabMap, isClient }: { text: string; vocabMap: Map<string, string>; isClient: boolean }) {
   if (!vocabMap.size) {
     return <div className="whitespace-pre-line text-center">{text}</div>;
@@ -170,12 +162,12 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem, allPoems }: 
   const relatedPoems = useMemo(() => {
     if (!allPoems.length) return [];
     
-    const currentThemes = poem.theme.split(/[|,]+/).map(t => t.trim().toLowerCase());
+    const currentThemes = poem.theme ? poem.theme.split(/[|,]+/).map(t => t.trim().toLowerCase()) : [];
     
     return allPoems
       .filter(p => p.id !== poem.id)
       .map(p => {
-        const pThemes = p.theme.split(/[|,]+/).map(t => t.trim().toLowerCase());
+        const pThemes = p.theme ? p.theme.split(/[|,]+/).map(t => t.trim().toLowerCase()) : [];
         const shared = pThemes.filter(t => currentThemes.includes(t)).length;
         return { ...p, sharedCount: shared };
       })
@@ -183,6 +175,10 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem, allPoems }: 
       .sort((a, b) => b.sharedCount - a.sharedCount || b.date.localeCompare(a.date))
       .slice(0, 5);
   }, [poem.id, poem.theme, allPoems]);
+
+  const themes = useMemo(() => {
+    return poem.theme ? poem.theme.split(/[|,]+/).map(t => t.trim()).filter(Boolean) : [];
+  }, [poem.theme]);
 
   useEffect(() => {
     const loadReviews = async () => {
@@ -267,9 +263,17 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem, allPoems }: 
           </Button>
 
           <header className="space-y-4 md:space-y-6 text-center relative">
-            <Badge variant="outline" className="font-normal tracking-[0.2em] border-primary/20 text-primary uppercase text-[8px] md:text-[10px] px-3">
-              {poem.theme}
-            </Badge>
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              {themes.map((theme, i) => (
+                <Badge 
+                  key={i}
+                  variant="outline" 
+                  className="font-normal tracking-[0.2em] border-primary/20 text-primary uppercase text-[8px] md:text-[10px] px-3 py-1 w-fit"
+                >
+                  {theme}
+                </Badge>
+              ))}
+            </div>
             
             <div className="flex items-center justify-center gap-10 group/title relative">
               <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-headline tracking-tight leading-tight px-2">
@@ -285,7 +289,7 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem, allPoems }: 
                           <Button 
                             variant="ghost" 
                             size="icon" 
-                            className="w-10 h-10 md:w-12 md:h-12 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/5 hover:scale-110 transition-all shrink-0 active:scale-95"
+                            className="w-10 h-10 md:w-12 md:h-12 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/5 hover:scale-110 transition-all shrink-0 active:scale-95 opacity-70"
                           >
                             <svg 
                               xmlns="http://www.w3.org/2000/svg" 
