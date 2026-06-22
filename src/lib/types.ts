@@ -13,6 +13,8 @@ export interface Poem {
   vocabulary?: string | null;
   vocab_words?: string | null;
   vocab_meanings?: string | null;
+  favorite?: boolean;
+  favorite_desc?: string | null;
 }
 
 export interface Review {
