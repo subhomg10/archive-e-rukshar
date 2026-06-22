@@ -10,7 +10,8 @@ export const fetchPoems = async (filter?: { theme?: string; search?: string }): 
   let query = supabase.from('poems').select('*');
 
   if (filter?.theme) {
-    query = query.eq('theme', filter.theme);
+    // Use ilike to match the theme within potentially combined theme strings (e.g., "Melancholy | Solitude")
+    query = query.ilike('theme', `%${filter.theme}%`);
   }
 
   if (filter?.search) {
@@ -46,6 +47,9 @@ export const fetchPoemById = async (id: string): Promise<Poem | null> => {
   return data as Poem;
 };
 
+/**
+ * Fetches all unique individual themes by splitting combined theme strings.
+ */
 export const fetchThemes = async (): Promise<string[]> => {
   const response = await supabase
     .from('poems')
@@ -55,8 +59,16 @@ export const fetchThemes = async (): Promise<string[]> => {
     return [];
   }
   
-  const themes = Array.from(new Set(response.data.map(i => i.theme))).filter(Boolean) as string[];
-  return themes;
+  const themeSet = new Set<string>();
+  response.data.forEach(item => {
+    if (item.theme) {
+      // Split by pipe, trim whitespace, and normalize
+      const individualThemes = item.theme.split(/[|]+/).map(t => t.trim()).filter(Boolean);
+      individualThemes.forEach(t => themeSet.add(t));
+    }
+  });
+  
+  return Array.from(themeSet).sort();
 };
 
 export const fetchFeaturedPoems = async (): Promise<Poem[]> => {
@@ -83,13 +95,19 @@ export const fetchArchiveStats = async () => {
       supabase.from('poems').select('theme')
     ]);
 
-    const uniqueThemes = new Set(themesData.data?.map(p => p.theme)).size;
+    // Calculate unique themes by splitting and counting individual entries
+    const individualThemes = new Set<string>();
+    themesData.data?.forEach(p => {
+      if (p.theme) {
+        p.theme.split(/[|]+/).map(t => t.trim()).filter(Boolean).forEach(t => individualThemes.add(t));
+      }
+    });
 
     return {
       totalPoems: poemsCount.count || 0,
       featuredPoems: featuredCount.count || 0,
       totalReviews: reviewsCount.count || 0,
-      totalThemes: uniqueThemes
+      totalThemes: individualThemes.size
     };
   } catch (err) {
     console.error("Error fetching archive stats:", err);
