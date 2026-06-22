@@ -329,7 +329,7 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem }: PoemClient
           </section>
 
           {/* Vocabulary Section */}
-          {poem.vocabulary && (
+          {vocabMap.size > 0 && (
             <>
               <Separator className="bg-border/30 max-w-[80px] md:max-w-[100px] mx-auto" />
               <section className="space-y-4 max-w-2xl mx-auto px-2">
@@ -343,7 +343,7 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem }: PoemClient
                       <BookOpen className="w-4 h-4" />
                     </div>
                     <span className="text-[10px] md:text-xs uppercase tracking-[0.3em] font-medium text-muted-foreground group-hover:text-foreground transition-colors">
-                      {showVocabulary ? 'Hide Vocabulary' : 'Show Vocabulary'}
+                      {showVocabulary ? 'Hide Vocabulary' : `Vocabulary (${vocabMap.size})`}
                     </span>
                   </div>
                   <div className={cn("transition-transform duration-500", showVocabulary ? "rotate-180" : "")}>
