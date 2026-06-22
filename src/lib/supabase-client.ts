@@ -10,7 +10,7 @@ export const fetchPoems = async (filter?: { theme?: string; search?: string }): 
   let query = supabase.from('poems').select('*');
 
   if (filter?.theme) {
-    // Use ilike to match the theme within potentially combined theme strings (e.g., "Melancholy | Solitude")
+    // Use ilike to match the theme within potentially combined theme strings (e.g., "Melancholy, Solitude")
     query = query.ilike('theme', `%${filter.theme}%`);
   }
 
@@ -49,6 +49,7 @@ export const fetchPoemById = async (id: string): Promise<Poem | null> => {
 
 /**
  * Fetches all unique individual themes by splitting combined theme strings.
+ * Supports both comma and pipe as separators.
  */
 export const fetchThemes = async (): Promise<string[]> => {
   const response = await supabase
@@ -62,8 +63,8 @@ export const fetchThemes = async (): Promise<string[]> => {
   const themeSet = new Set<string>();
   response.data.forEach(item => {
     if (item.theme) {
-      // Split by pipe, trim whitespace, and normalize
-      const individualThemes = item.theme.split(/[|]+/).map(t => t.trim()).filter(Boolean);
+      // Split by comma or pipe, trim whitespace, and filter out empty strings
+      const individualThemes = item.theme.split(/[|,]+/).map(t => t.trim()).filter(Boolean);
       individualThemes.forEach(t => themeSet.add(t));
     }
   });
@@ -96,10 +97,11 @@ export const fetchArchiveStats = async () => {
     ]);
 
     // Calculate unique themes by splitting and counting individual entries
+    // Supports both comma and pipe as separators
     const individualThemes = new Set<string>();
     themesData.data?.forEach(p => {
       if (p.theme) {
-        p.theme.split(/[|]+/).map(t => t.trim()).filter(Boolean).forEach(t => individualThemes.add(t));
+        p.theme.split(/[|,]+/).map(t => t.trim()).filter(Boolean).forEach(t => individualThemes.add(t));
       }
     });
 
