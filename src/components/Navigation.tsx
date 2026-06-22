@@ -2,10 +2,10 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Instagram, Mail, Sparkles } from 'lucide-react';
+import { Instagram, Mail, Sparkles, Check } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 const navItems = [
@@ -17,10 +17,19 @@ const navItems = [
 export function Navigation() {
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const handleCopyEmail = () => {
+    if (typeof window !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText('subhomghosh06@gmail.com');
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
   return (
     <nav className="sticky top-0 z-50 w-full premium-blur border-b border-border/50">
@@ -86,16 +95,42 @@ export function Navigation() {
                       <Sparkles className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity text-primary ml-2" />
                     </a>
                     
-                    <a 
-                      href="mailto:subhomghosh06@gmail.com"
-                      className="group flex items-center justify-between p-3 rounded-xl hover:bg-primary/5 transition-colors"
+                    <button 
+                      onClick={handleCopyEmail}
+                      className="w-full group flex items-center justify-between p-3 rounded-xl hover:bg-primary/5 transition-colors text-left outline-none"
                     >
                       <div className="flex items-center gap-3">
-                        <Mail className="w-4 h-4 text-primary/60 group-hover:text-primary transition-colors" />
-                        <span className="text-xs font-light tracking-wide whitespace-nowrap">subhomghosh06@gmail.com</span>
+                        <div className="relative w-4 h-4">
+                          <AnimatePresence mode="wait">
+                            {copied ? (
+                              <motion.div
+                                key="check"
+                                initial={{ opacity: 0, scale: 0.5 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.5 }}
+                                transition={{ duration: 0.2 }}
+                              >
+                                <Check className="w-4 h-4 text-primary" />
+                              </motion.div>
+                            ) : (
+                              <motion.div
+                                key="mail"
+                                initial={{ opacity: 0, scale: 0.5 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.5 }}
+                                transition={{ duration: 0.2 }}
+                              >
+                                <Mail className="w-4 h-4 text-primary/60 group-hover:text-primary transition-colors" />
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                        <span className="text-xs font-light tracking-wide whitespace-nowrap">
+                          {copied ? 'Copied to Clipboard' : 'subhomghosh06@gmail.com'}
+                        </span>
                       </div>
                       <Sparkles className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity text-primary ml-2" />
-                    </a>
+                    </button>
                   </div>
                 </PopoverContent>
               </Popover>
