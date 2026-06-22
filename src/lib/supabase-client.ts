@@ -50,6 +50,7 @@ export const fetchPoemById = async (id: string): Promise<Poem | null> => {
 /**
  * Fetches all unique individual themes by splitting combined theme strings.
  * Supports both comma and pipe as separators.
+ * Normalizes themes for consistent display and uniqueness.
  */
 export const fetchThemes = async (): Promise<string[]> => {
   const response = await supabase
@@ -60,16 +61,24 @@ export const fetchThemes = async (): Promise<string[]> => {
     return [];
   }
   
-  const themeSet = new Set<string>();
+  // Use a map to handle case-insensitive uniqueness while preserving a preferred display casing
+  const themeMap = new Map<string, string>();
+  
   response.data.forEach(item => {
-    if (item.theme) {
+    if (item.theme && typeof item.theme === 'string') {
       // Split by comma or pipe, trim whitespace, and filter out empty strings
       const individualThemes = item.theme.split(/[|,]+/).map(t => t.trim()).filter(Boolean);
-      individualThemes.forEach(t => themeSet.add(t));
+      
+      individualThemes.forEach(t => {
+        const normalized = t.toLowerCase();
+        if (!themeMap.has(normalized)) {
+          themeMap.set(normalized, t); // Store the first version encountered as the display version
+        }
+      });
     }
   });
   
-  return Array.from(themeSet).sort();
+  return Array.from(themeMap.values()).sort((a, b) => a.localeCompare(b));
 };
 
 export const fetchFeaturedPoems = async (): Promise<Poem[]> => {
@@ -97,11 +106,17 @@ export const fetchArchiveStats = async () => {
     ]);
 
     // Calculate unique themes by splitting and counting individual entries
-    // Supports both comma and pipe as separators
-    const individualThemes = new Set<string>();
+    // Normalize to lowercase to ensure consistent comparison (e.g. "Love" and "love" are the same)
+    const uniqueThemes = new Set<string>();
     themesData.data?.forEach(p => {
-      if (p.theme) {
-        p.theme.split(/[|,]+/).map(t => t.trim()).filter(Boolean).forEach(t => individualThemes.add(t));
+      if (p.theme && typeof p.theme === 'string') {
+        const parts = p.theme.split(/[|,]+/);
+        parts.forEach(part => {
+          const trimmed = part.trim().toLowerCase();
+          if (trimmed) {
+            uniqueThemes.add(trimmed);
+          }
+        });
       }
     });
 
@@ -109,7 +124,7 @@ export const fetchArchiveStats = async () => {
       totalPoems: poemsCount.count || 0,
       featuredPoems: featuredCount.count || 0,
       totalReviews: reviewsCount.count || 0,
-      totalThemes: individualThemes.size
+      totalThemes: uniqueThemes.size
     };
   } catch (err) {
     console.error("Error fetching archive stats:", err);
