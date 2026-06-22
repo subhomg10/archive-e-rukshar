@@ -2,7 +2,7 @@
 
 import { Navigation } from '@/components/Navigation';
 import { motion } from 'framer-motion';
-import { Instagram, Mail, BookOpen, PenTool, Sparkles } from 'lucide-react';
+import { BookOpen, PenTool, Sparkles } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
@@ -32,7 +32,7 @@ export function AboutClient() {
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="space-y-12 md:space-y-16"
+          className="space-y-10 md:space-y-12"
         >
           {/* Header */}
           <motion.header variants={itemVariants} className="space-y-4 text-center">
@@ -61,7 +61,7 @@ export function AboutClient() {
           </motion.div>
 
           {/* About Rukshar */}
-          <motion.section variants={itemVariants} className="space-y-6">
+          <motion.section variants={itemVariants} className="space-y-4">
             <div className="flex items-center gap-4 text-primary/60">
               <Sparkles className="w-4 h-4" />
               <h2 className="text-[10px] uppercase tracking-[0.3em] font-medium">About Rukshar</h2>
@@ -79,7 +79,7 @@ export function AboutClient() {
           <Separator className="bg-border/20 max-w-[100px] mx-auto" />
 
           {/* Why This Archive Exists */}
-          <motion.section variants={itemVariants} className="space-y-6">
+          <motion.section variants={itemVariants} className="space-y-4">
             <div className="flex items-center gap-4 text-primary/60">
               <BookOpen className="w-4 h-4" />
               <h2 className="text-[10px] uppercase tracking-[0.3em] font-medium">The Purpose</h2>
@@ -97,7 +97,7 @@ export function AboutClient() {
           <Separator className="bg-border/20 max-w-[100px] mx-auto" />
 
           {/* Writing Philosophy */}
-          <motion.section variants={itemVariants} className="space-y-6">
+          <motion.section variants={itemVariants} className="space-y-4">
             <div className="flex items-center gap-4 text-primary/60">
               <PenTool className="w-4 h-4" />
               <h2 className="text-[10px] uppercase tracking-[0.3em] font-medium">Philosophy</h2>
@@ -107,42 +107,6 @@ export function AboutClient() {
               <p className="text-lg md:text-xl font-light leading-relaxed text-muted-foreground">
                 My work is rooted in narrative poetry. I believe that ordinary objects, overlooked places, and the silent elements of nature are the truest storytellers. They carry our memories, witness our most intimate relationships, and silently reveal how time transforms our souls.
               </p>
-            </div>
-          </motion.section>
-
-          <Separator className="bg-border/20 max-w-[100px] mx-auto" />
-
-          {/* Contact Details */}
-          <motion.section variants={itemVariants} className="space-y-10">
-            <div className="text-center space-y-3">
-              <h2 className="text-2xl md:text-3xl font-headline">Connect with the Words</h2>
-              <p className="text-sm text-muted-foreground font-light">For inquiries, collaborations, or shared reflections.</p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
-              <a 
-                href="https://instagram.com/seventhsky._" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="group flex items-center justify-between p-5 rounded-2xl border border-border/50 bg-card/20 hover:border-primary/30 transition-all duration-500"
-              >
-                <div className="flex items-center gap-4">
-                  <Instagram className="w-5 h-5 text-primary/60 group-hover:text-primary transition-colors" />
-                  <span className="text-xs md:text-sm font-light tracking-wide">@seventhsky._</span>
-                </div>
-                <Sparkles className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity text-primary" />
-              </a>
-              
-              <a 
-                href="mailto:subhomghosh06@gmail.com"
-                className="group flex items-center justify-between p-5 rounded-2xl border border-border/50 bg-card/20 hover:border-primary/30 transition-all duration-500"
-              >
-                <div className="flex items-center gap-4">
-                  <Mail className="w-5 h-5 text-primary/60 group-hover:text-primary transition-colors" />
-                  <span className="text-xs md:text-sm font-light tracking-wide">subhomghosh06@gmail.com</span>
-                </div>
-                <Sparkles className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity text-primary" />
-              </a>
             </div>
           </motion.section>
 
