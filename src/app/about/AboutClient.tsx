@@ -1,12 +1,28 @@
 "use client";
 
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Navigation } from '@/components/Navigation';
 import { motion } from 'framer-motion';
-import { BookOpen, PenTool, Sparkles } from 'lucide-react';
+import { BookOpen, PenTool, Sparkles, Star, ArrowRight } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Poem } from '@/lib/types';
+import { fetchFavoritePoem } from '@/lib/supabase-client';
 
 export function AboutClient() {
+  const [favoritePoem, setFavoritePoem] = useState<Poem | null>(null);
+
+  useEffect(() => {
+    const loadFavorite = async () => {
+      const poem = await fetchFavoritePoem();
+      setFavoritePoem(poem);
+    };
+    loadFavorite();
+  }, []);
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -109,6 +125,49 @@ export function AboutClient() {
               </p>
             </div>
           </motion.section>
+
+          {/* Favorite Poem Section */}
+          {favoritePoem && (
+            <motion.section variants={itemVariants} className="space-y-8 pt-8">
+              <div className="flex items-center gap-4 text-primary/60">
+                <Star className="w-4 h-4" />
+                <h2 className="text-[10px] uppercase tracking-[0.3em] font-medium">Favorite Poem</h2>
+              </div>
+              
+              <div className="space-y-8">
+                <div className="space-y-4">
+                  <h3 className="text-3xl md:text-5xl font-headline italic">{favoritePoem.title}</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {favoritePoem.theme.split(/[|,]+/).map((t, i) => (
+                      <Badge 
+                        key={i} 
+                        variant="outline" 
+                        className="text-[10px] uppercase tracking-widest border-primary/20 text-primary/80 font-normal py-0.5 px-2"
+                      >
+                        {t.trim()}
+                      </Badge>
+                    ))}
+                  </div>
+                  <Button asChild variant="link" className="text-primary p-0 h-auto font-light tracking-wider text-sm">
+                    <Link href={`/poem/${favoritePoem.id}`} className="flex items-center gap-2">
+                      Read Poem <ArrowRight className="w-3 h-3" />
+                    </Link>
+                  </Button>
+                </div>
+
+                {favoritePoem.favorite_desc && (
+                  <div className="space-y-4 pt-4 border-l-2 border-primary/10 pl-6">
+                    <h4 className="text-[10px] uppercase tracking-[0.3em] font-medium text-muted-foreground">Why This Poem?</h4>
+                    <p className="text-lg md:text-xl font-light leading-relaxed text-muted-foreground italic">
+                      "{favoritePoem.favorite_desc}"
+                    </p>
+                  </div>
+                )}
+              </div>
+            </motion.section>
+          )}
+
+          <Separator className="bg-border/20 max-w-[100px] mx-auto" />
 
           {/* Closing Note */}
           <motion.section variants={itemVariants} className="pt-12 text-center space-y-6">

@@ -10,7 +10,6 @@ export const fetchPoems = async (filter?: { theme?: string; search?: string }): 
   let query = supabase.from('poems').select('*');
 
   if (filter?.theme) {
-    // Use ilike to match the theme within potentially combined theme strings (e.g., "Melancholy, Solitude")
     query = query.ilike('theme', `%${filter.theme}%`);
   }
 
@@ -29,9 +28,6 @@ export const fetchPoems = async (filter?: { theme?: string; search?: string }): 
   return (response.data || []) as Poem[];
 };
 
-/**
- * Fetches a single poem by ID.
- */
 export const fetchPoemById = async (id: string): Promise<Poem | null> => {
   const { data, error } = await supabase
     .from('poems')
@@ -47,11 +43,21 @@ export const fetchPoemById = async (id: string): Promise<Poem | null> => {
   return data as Poem;
 };
 
-/**
- * Fetches all unique individual themes by splitting combined theme strings.
- * Supports both comma and pipe as separators.
- * Normalizes themes for consistent display and uniqueness.
- */
+export const fetchFavoritePoem = async (): Promise<Poem | null> => {
+  const { data, error } = await supabase
+    .from('poems')
+    .select('*')
+    .eq('favorite', true)
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    console.error("fetchFavoritePoem Error:", error.message);
+    return null;
+  }
+  return data as Poem;
+};
+
 export const fetchThemes = async (): Promise<string[]> => {
   const response = await supabase
     .from('poems')
@@ -61,18 +67,15 @@ export const fetchThemes = async (): Promise<string[]> => {
     return [];
   }
   
-  // Use a map to handle case-insensitive uniqueness while preserving a preferred display casing
   const themeMap = new Map<string, string>();
   
   response.data.forEach(item => {
     if (item.theme && typeof item.theme === 'string') {
-      // Split by comma or pipe, trim whitespace, and filter out empty strings
       const individualThemes = item.theme.split(/[|,]+/).map(t => t.trim()).filter(Boolean);
-      
       individualThemes.forEach(t => {
         const normalized = t.toLowerCase();
         if (!themeMap.has(normalized)) {
-          themeMap.set(normalized, t); // Store the first version encountered as the display version
+          themeMap.set(normalized, t);
         }
       });
     }
@@ -105,8 +108,6 @@ export const fetchArchiveStats = async () => {
       supabase.from('poems').select('theme')
     ]);
 
-    // Calculate unique themes by splitting and counting individual entries
-    // Normalize to lowercase to ensure consistent comparison (e.g. "Love" and "love" are the same)
     const uniqueThemes = new Set<string>();
     themesData.data?.forEach(p => {
       if (p.theme && typeof p.theme === 'string') {
@@ -137,9 +138,6 @@ export const fetchArchiveStats = async () => {
   }
 };
 
-/**
- * Reviews fetching and submission
- */
 export const fetchReviews = async (poemId: string): Promise<Review[]> => {
   try {
     const { data, error } = await supabase
