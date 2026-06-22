@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { ChevronLeft, ChevronRight, Loader2, Star, Send, MessageCircle, BookOpen, ChevronDown } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Loader2, Star, Send, MessageCircle, BookOpen, ChevronDown, Clock } from 'lucide-react';
 import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -138,6 +138,14 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem }: PoemClient
     return map;
   }, [poem.vocab_words, poem.vocab_meanings]);
 
+  // Reading Time calculation
+  const readingTime = useMemo(() => {
+    const allText = [poem.roman, poem.hindi, poem.urdu].filter(Boolean).join(' ');
+    const words = allText.trim().split(/\s+/).length;
+    // Assuming 200 words per minute average reading speed
+    return words > 0 ? Math.max(1, Math.round(words / 200)) : 0;
+  }, [poem.roman, poem.hindi, poem.urdu]);
+
   useEffect(() => {
     const loadReviews = async () => {
       setLoadingReviews(true);
@@ -229,6 +237,15 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem }: PoemClient
               <span className="font-body text-[10px] md:text-xs tracking-wider uppercase">
                 {poem.date}
               </span>
+              {readingTime > 0 && (
+                <>
+                  <span className="hidden sm:inline opacity-30">|</span>
+                  <span className="flex items-center gap-1.5 font-body text-[10px] md:text-xs tracking-wider uppercase">
+                    <Clock className="w-3 h-3 opacity-60" />
+                    {readingTime} min read
+                  </span>
+                </>
+              )}
             </div>
           </header>
 
