@@ -263,6 +263,13 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem, allPoems }: 
           </Button>
 
           <header className="space-y-4 md:space-y-6 text-center relative">
+            {poem.favorite && (
+              <div className="flex items-center justify-center gap-2 text-primary/60 animate-in fade-in slide-in-from-top-2 duration-1000 mb-2">
+                <Star className="w-3 h-3 fill-current" />
+                <span className="text-[9px] uppercase tracking-[0.4em] font-medium">Author's Favorite</span>
+              </div>
+            )}
+            
             <div className="flex flex-wrap items-center justify-center gap-2">
               {themes.map((theme, i) => (
                 <Badge 
@@ -503,26 +510,6 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem, allPoems }: 
           </section>
 
           <Separator className="bg-border/30 max-w-[80px] md:max-w-[100px] mx-auto" />
-
-          {/* Favorite Poem Section */}
-          {poem.favorite && poem.favorite_desc && (
-            <section className="space-y-8 max-w-2xl mx-auto px-2 py-8">
-              <header className="space-y-3 text-center">
-                <div className="flex items-center justify-center gap-2 text-primary/60">
-                   <Star className="w-3.5 h-3.5 fill-current" />
-                   <h3 className="text-[10px] uppercase tracking-[0.3em] font-medium">Favorite Poem</h3>
-                   <Star className="w-3.5 h-3.5 fill-current" />
-                </div>
-                <p className="text-xs md:text-sm font-light italic text-muted-foreground">This poem holds a special place in my archive.</p>
-              </header>
-              <div className="relative">
-                <p className="text-base md:text-lg font-light leading-relaxed text-foreground/80 italic text-center px-4">
-                  "{poem.favorite_desc}"
-                </p>
-              </div>
-              <Separator className="bg-border/30 max-w-[60px] mx-auto" />
-            </section>
-          )}
 
           <section className="space-y-10 md:space-y-12 max-w-3xl mx-auto pt-8 md:pt-12 px-2">
             <header className="space-y-2 text-center">
