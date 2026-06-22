@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { ChevronLeft, Loader2, Star, Send, MessageCircle, BookOpen, ChevronDown } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -88,6 +88,14 @@ export function PoemClient({ initialPoem: poem }: PoemClientProps) {
   const router = useRouter();
   const { toast } = useToast();
   
+  // Progress Bar Logic
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001
+  });
+
   // Review State
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
@@ -175,6 +183,10 @@ export function PoemClient({ initialPoem: poem }: PoemClientProps) {
 
   return (
     <div className="min-h-screen bg-background">
+      <motion.div
+        className="fixed top-0 left-0 right-0 h-[3px] bg-primary origin-left z-[60]"
+        style={{ scaleX }}
+      />
       <Navigation />
       
       <main className="max-w-6xl mx-auto px-4 md:px-6 py-12 md:py-24">
