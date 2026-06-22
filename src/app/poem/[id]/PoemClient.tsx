@@ -271,7 +271,7 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem, allPoems }: 
               {poem.theme}
             </Badge>
             
-            <div className="flex items-center justify-center gap-5 group/title relative">
+            <div className="flex items-center justify-center gap-10 group/title relative">
               <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-headline tracking-tight leading-tight px-2">
                 {poem.title}
               </h1>
@@ -293,7 +293,7 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem, allPoems }: 
                               viewBox="0 -960 960 960" 
                               width="24px" 
                               fill="currentColor"
-                              className="w-6 h-6 md:w-7 md:h-7 opacity-50 group-hover/title:opacity-100 transition-opacity"
+                              className="w-6 h-6 md:w-7 md:h-7 opacity-70 group-hover/title:opacity-100 transition-opacity"
                             >
                               <path d="M120-240v-80h520v80H120Zm664-40L584-480l200-200 56 56-144 144 144 144-56 56ZM120-440v-80h400v80H120Zm0-200v-80h520v80H120Z"/>
                             </svg>
