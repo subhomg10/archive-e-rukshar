@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Instagram, Mail, Sparkles } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 const navItems = [
   { name: 'Home', path: '/archive' },
@@ -15,6 +16,11 @@ const navItems = [
 
 export function Navigation() {
   const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <nav className="sticky top-0 z-50 w-full premium-blur border-b border-border/50">
@@ -52,42 +58,48 @@ export function Navigation() {
           })}
           
           <li>
-            <Popover>
-              <PopoverTrigger className="relative py-1 text-xs sm:text-sm font-medium transition-colors hover:text-primary text-muted-foreground whitespace-nowrap outline-none">
+            {!mounted ? (
+              <span className="relative py-1 text-xs sm:text-sm font-medium text-muted-foreground cursor-pointer">
                 Contact
-              </PopoverTrigger>
-              <PopoverContent 
-                align="end" 
-                sideOffset={16}
-                className="w-64 p-2 bg-card/95 backdrop-blur-md border-border/50 shadow-2xl rounded-2xl overflow-hidden"
-              >
-                <div className="space-y-1">
-                  <a 
-                    href="https://instagram.com/seventhsky._" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="group flex items-center justify-between p-3 rounded-xl hover:bg-primary/5 transition-colors"
-                  >
-                    <div className="flex items-center gap-3">
-                      <Instagram className="w-4 h-4 text-primary/60 group-hover:text-primary transition-colors" />
-                      <span className="text-xs font-light tracking-wide">@seventhsky._</span>
-                    </div>
-                    <Sparkles className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity text-primary" />
-                  </a>
-                  
-                  <a 
-                    href="mailto:subhomghosh06@gmail.com"
-                    className="group flex items-center justify-between p-3 rounded-xl hover:bg-primary/5 transition-colors"
-                  >
-                    <div className="flex items-center gap-3">
-                      <Mail className="w-4 h-4 text-primary/60 group-hover:text-primary transition-colors" />
-                      <span className="text-xs font-light tracking-wide truncate max-w-[140px]">subhomghosh06@gmail.com</span>
-                    </div>
-                    <Sparkles className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity text-primary" />
-                  </a>
-                </div>
-              </PopoverContent>
-            </Popover>
+              </span>
+            ) : (
+              <Popover>
+                <PopoverTrigger className="relative py-1 text-xs sm:text-sm font-medium transition-colors hover:text-primary text-muted-foreground whitespace-nowrap outline-none">
+                  Contact
+                </PopoverTrigger>
+                <PopoverContent 
+                  align="end" 
+                  sideOffset={16}
+                  className="w-64 p-2 bg-card/95 backdrop-blur-md border-border/50 shadow-2xl rounded-2xl overflow-hidden"
+                >
+                  <div className="space-y-1">
+                    <a 
+                      href="https://instagram.com/seventhsky._" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="group flex items-center justify-between p-3 rounded-xl hover:bg-primary/5 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Instagram className="w-4 h-4 text-primary/60 group-hover:text-primary transition-colors" />
+                        <span className="text-xs font-light tracking-wide">@seventhsky._</span>
+                      </div>
+                      <Sparkles className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity text-primary" />
+                    </a>
+                    
+                    <a 
+                      href="mailto:subhomghosh06@gmail.com"
+                      className="group flex items-center justify-between p-3 rounded-xl hover:bg-primary/5 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Mail className="w-4 h-4 text-primary/60 group-hover:text-primary transition-colors" />
+                        <span className="text-xs font-light tracking-wide truncate max-w-[140px]">subhomghosh06@gmail.com</span>
+                      </div>
+                      <Sparkles className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity text-primary" />
+                    </a>
+                  </div>
+                </PopoverContent>
+              </Popover>
+            )}
           </li>
         </ul>
       </div>
