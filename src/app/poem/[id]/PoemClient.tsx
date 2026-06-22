@@ -28,24 +28,61 @@ interface PoemClientProps {
 }
 
 /**
+ * InteractiveWord component to handle word-based meanings.
+ * Supports hover on desktop and tap on mobile.
+ */
+function InteractiveWord({ word, meaning }: { word: string; meaning: string }) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <PopoverTrigger asChild>
+        <span
+          className="cursor-help underline underline-offset-4 decoration-primary/20 hover:decoration-primary/50 transition-colors duration-300"
+          onMouseEnter={() => {
+            if (typeof window !== 'undefined' && window.matchMedia('(hover: hover)').matches) {
+              setIsOpen(true);
+            }
+          }}
+          onMouseLeave={() => {
+            if (typeof window !== 'undefined' && window.matchMedia('(hover: hover)').matches) {
+              setIsOpen(false);
+            }
+          }}
+          onClick={(e) => {
+            // On touch devices, toggle the state. On desktop, hover already handled it.
+            if (typeof window !== 'undefined' && !window.matchMedia('(hover: hover)').matches) {
+              setIsOpen(!isOpen);
+            }
+          }}
+        >
+          {word}
+        </span>
+      </PopoverTrigger>
+      <PopoverContent 
+        side="bottom" 
+        className="w-auto max-w-[220px] p-3 bg-card/95 backdrop-blur-md border-border/50 shadow-xl rounded-xl z-[70] pointer-events-none select-none"
+      >
+        <p className="text-xs md:text-sm font-light italic text-primary leading-relaxed">
+          {meaning}
+        </p>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+/**
  * InteractivePoem component to handle word-based meanings with soft marking and stable layout.
- * Underlines only the first occurrence of each vocabulary word to keep the reading experience clean.
+ * Underlines only the first occurrence of each vocabulary word.
  */
 function InteractivePoem({ text, vocabMap, isClient }: { text: string; vocabMap: Map<string, string>; isClient: boolean }) {
   if (!vocabMap.size) {
     return <div className="whitespace-pre-line text-center">{text}</div>;
   }
 
-  // Track words that have already been highlighted in this render
   const seenWords = new Set<string>();
-
-  // Get vocabulary words, sorted by length descending to ensure longer phrases are matched first if applicable
   const vocabWords = Array.from(vocabMap.keys()).sort((a, b) => b.length - a.length);
-  
-  // Escape special regex characters
   const escapedWords = vocabWords.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
-  
-  // Use word boundaries \b for exact matches and case-insensitive flag 'i'
   const regex = new RegExp(`(\\b(?:${escapedWords})\\b)`, 'gi');
 
   const lines = text.split('\n');
@@ -58,27 +95,9 @@ function InteractivePoem({ text, vocabMap, isClient }: { text: string; vocabMap:
             const lowerPart = part.toLowerCase();
             const meaning = vocabMap.get(lowerPart);
             
-            // Highlight only if it's a vocab word AND it's the first time we're seeing it
-            // ONLY use Popover if we are on the client to avoid hydration mismatch
             if (meaning && !seenWords.has(lowerPart) && isClient) {
               seenWords.add(lowerPart);
-              return (
-                <Popover key={`pop-${lineIdx}-${partIdx}`}>
-                  <PopoverTrigger asChild>
-                    <span className="cursor-help underline underline-offset-4 decoration-primary/20 hover:decoration-primary/50 transition-colors duration-300">
-                      {part}
-                    </span>
-                  </PopoverTrigger>
-                  <PopoverContent 
-                    side="bottom" 
-                    className="w-auto max-w-[240px] p-3 bg-card/95 backdrop-blur-md border-border/50 shadow-xl rounded-xl z-[70]"
-                  >
-                    <p className="text-xs md:text-sm font-light italic text-primary leading-relaxed">
-                      {meaning}
-                    </p>
-                  </PopoverContent>
-                </Popover>
-              );
+              return <InteractiveWord key={`word-${lineIdx}-${partIdx}`} word={part} meaning={meaning} />;
             }
             return <span key={`part-${lineIdx}-${partIdx}`}>{part}</span>;
           })}
@@ -98,7 +117,6 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem }: PoemClient
     setMounted(true);
   }, []);
 
-  // Progress Bar Logic - targeted to the poem content area
   const { scrollYProgress } = useScroll({
     target: contentRef,
     offset: ["start center", "end center"]
@@ -110,7 +128,6 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem }: PoemClient
     restDelta: 0.001
   });
 
-  // Review State
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
   const [newReview, setNewReview] = useState({
@@ -119,11 +136,8 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem }: PoemClient
     comment: ''
   });
   const [submittingReview, setSubmittingReview] = useState(false);
-  
-  // Vocabulary state
   const [showVocabulary, setShowVocabulary] = useState(false);
 
-  // Interactive Vocabulary Map - Normalizes keys to lowercase for reliable matching
   const vocabMap = useMemo(() => {
     const map = new Map<string, string>();
     if (!poem.vocab_words || !poem.vocab_meanings) return map;
@@ -131,11 +145,9 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem }: PoemClient
     const words = poem.vocab_words.split('|').map(w => w.trim());
     const meanings = poem.vocab_meanings.split('|').map(m => m.trim());
 
-    // Iterate through words to build the map, handling potential length mismatches safely
     words.forEach((word, index) => {
       const lowerWord = word.toLowerCase();
       const meaning = meanings[index];
-      
       if (lowerWord && meaning) {
         map.set(lowerWord, meaning);
       }
@@ -144,12 +156,15 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem }: PoemClient
     return map;
   }, [poem.vocab_words, poem.vocab_meanings]);
 
-  // Reading Time calculation
+  const vocabCount = useMemo(() => {
+    if (!poem.vocab_words) return 0;
+    return poem.vocab_words.split('|').filter(w => w.trim().length > 0).length;
+  }, [poem.vocab_words]);
+
   const readingTime = useMemo(() => {
     const allText = [poem.roman, poem.hindi, poem.urdu].filter(Boolean).join(' ');
-    const words = allText.trim().split(/\s+/).length;
-    // Assuming 200 words per minute average reading speed
-    return words > 0 ? Math.max(1, Math.round(words / 200)) : 0;
+    const wordsCount = allText.trim().split(/\s+/).length;
+    return wordsCount > 0 ? Math.max(1, Math.round(wordsCount / 200)) : 0;
   }, [poem.roman, poem.hindi, poem.urdu]);
 
   useEffect(() => {
@@ -218,7 +233,6 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem }: PoemClient
           transition={{ duration: 0.8 }}
           className="space-y-10 md:space-y-16"
         >
-          {/* Back Button */}
           <Button 
             variant="ghost" 
             size="sm" 
@@ -229,7 +243,6 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem }: PoemClient
             Archive
           </Button>
 
-          {/* Poem Header */}
           <header className="space-y-4 md:space-y-6 text-center">
             <Badge variant="outline" className="font-normal tracking-[0.2em] border-primary/20 text-primary uppercase text-[8px] md:text-[10px] px-3">
               {poem.theme}
@@ -257,7 +270,6 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem }: PoemClient
 
           <Separator className="bg-border/30 max-w-[100px] mx-auto" />
 
-          {/* Poem Content Tabs - Tracking Ref Attached Here */}
           <div ref={contentRef} className="py-8">
             {!mounted ? (
               <article className="reading-container px-2">
@@ -308,7 +320,6 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem }: PoemClient
 
           <Separator className="bg-border/30 max-w-[80px] md:max-w-[100px] mx-auto" />
 
-          {/* About this Fragment Section */}
           <section className="space-y-4 md:space-y-6 max-w-2xl mx-auto px-2">
             <div className="flex items-center space-x-3 text-primary/70">
               <h3 className="text-[10px] md:text-xs uppercase tracking-[0.2em] font-medium">About this Fragment</h3>
@@ -328,8 +339,7 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem }: PoemClient
             </div>
           </section>
 
-          {/* Vocabulary Section */}
-          {vocabMap.size > 0 && (
+          {vocabCount > 0 && (
             <>
               <Separator className="bg-border/30 max-w-[80px] md:max-w-[100px] mx-auto" />
               <section className="space-y-4 max-w-2xl mx-auto px-2">
@@ -343,7 +353,7 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem }: PoemClient
                       <BookOpen className="w-4 h-4" />
                     </div>
                     <span className="text-[10px] md:text-xs uppercase tracking-[0.3em] font-medium text-muted-foreground group-hover:text-foreground transition-colors">
-                      {showVocabulary ? 'Hide Vocabulary' : `Vocabulary (${vocabMap.size})`}
+                      {showVocabulary ? 'Hide Vocabulary' : `Vocabulary (${vocabCount})`}
                     </span>
                   </div>
                   <div className={cn("transition-transform duration-500", showVocabulary ? "rotate-180" : "")}>
@@ -372,7 +382,6 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem }: PoemClient
 
           <Separator className="bg-border/30 max-w-[80px] md:max-w-[100px] mx-auto" />
 
-          {/* Poem Navigation */}
           <section className="max-w-2xl mx-auto px-2 py-4">
             <div className="flex items-center justify-between gap-4">
               <div className="flex-1">
@@ -413,7 +422,6 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem }: PoemClient
 
           <Separator className="bg-border/30 max-w-[80px] md:max-w-[100px] mx-auto" />
 
-          {/* Public Impressions Section */}
           <section className="space-y-10 md:space-y-12 max-w-3xl mx-auto pt-8 md:pt-12 px-2">
             <header className="space-y-2 text-center">
               <div className="flex items-center justify-center space-x-3 text-primary/70 mb-2">
@@ -423,7 +431,6 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem }: PoemClient
               <p className="text-[10px] md:text-xs text-muted-foreground font-light">Share your own resonance with these words.</p>
             </header>
 
-            {/* Review Form */}
             <Card className="bg-card/20 border-border/40 rounded-2xl md:rounded-3xl overflow-hidden">
               <CardContent className="p-6 md:p-8">
                 <form onSubmit={handleReviewSubmit} className="space-y-6 md:space-y-8">
@@ -478,7 +485,6 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem }: PoemClient
               </CardContent>
             </Card>
 
-            {/* Reviews List */}
             <div className="space-y-6 md:space-y-8">
               {reviews.length > 0 && (
                 <h3 className="text-lg md:text-xl font-headline text-center mb-6 md:mb-8">Impressions</h3>
