@@ -94,8 +94,10 @@ export function AboutClient() {
             </div>
           </motion.section>
 
+          <Separator className="bg-border/30 max-w-[100px] mx-auto" />
+
           {/* Writing Philosophy */}
-          <motion.section variants={itemVariants} className="space-y-8 bg-card/10 p-8 md:p-12 rounded-3xl border border-border/30">
+          <motion.section variants={itemVariants} className="space-y-8">
             <div className="flex items-center gap-4 text-primary/60">
               <PenTool className="w-4 h-4" />
               <h2 className="text-[10px] uppercase tracking-[0.3em] font-medium">Philosophy</h2>
