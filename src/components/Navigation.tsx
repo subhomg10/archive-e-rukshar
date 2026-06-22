@@ -70,7 +70,7 @@ export function Navigation() {
                 <PopoverContent 
                   align="end" 
                   sideOffset={16}
-                  className="w-64 p-2 bg-card/95 backdrop-blur-md border-border/50 shadow-2xl rounded-2xl overflow-hidden"
+                  className="w-auto min-w-[200px] p-2 bg-card/95 backdrop-blur-md border-border/50 shadow-2xl rounded-2xl overflow-hidden"
                 >
                   <div className="space-y-1">
                     <a 
@@ -83,7 +83,7 @@ export function Navigation() {
                         <Instagram className="w-4 h-4 text-primary/60 group-hover:text-primary transition-colors" />
                         <span className="text-xs font-light tracking-wide">@seventhsky._</span>
                       </div>
-                      <Sparkles className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity text-primary" />
+                      <Sparkles className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity text-primary ml-2" />
                     </a>
                     
                     <a 
@@ -92,9 +92,9 @@ export function Navigation() {
                     >
                       <div className="flex items-center gap-3">
                         <Mail className="w-4 h-4 text-primary/60 group-hover:text-primary transition-colors" />
-                        <span className="text-xs font-light tracking-wide truncate max-w-[140px]">subhomghosh06@gmail.com</span>
+                        <span className="text-xs font-light tracking-wide whitespace-nowrap">subhomghosh06@gmail.com</span>
                       </div>
-                      <Sparkles className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity text-primary" />
+                      <Sparkles className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity text-primary ml-2" />
                     </a>
                   </div>
                 </PopoverContent>
