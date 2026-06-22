@@ -1,3 +1,4 @@
+
 import { fetchPoemById, fetchPoems } from '@/lib/supabase-client';
 import { PoemClient } from './PoemClient';
 import { Metadata, ResolvingMetadata } from 'next';
@@ -50,8 +51,7 @@ export default async function PoemPage({ params }: Props) {
     notFound();
   }
 
-  // Fetch all poems to determine navigation neighbors
-  // Navigation follows the default sort (date descending)
+  // Fetch all poems to determine navigation neighbors and related content
   const allPoems = await fetchPoems();
   const currentIndex = allPoems.findIndex(p => p.id === id);
   
@@ -84,6 +84,7 @@ export default async function PoemPage({ params }: Props) {
         initialPoem={poem} 
         prevPoem={prevPoem}
         nextPoem={nextPoem}
+        allPoems={allPoems}
       />
     </>
   );

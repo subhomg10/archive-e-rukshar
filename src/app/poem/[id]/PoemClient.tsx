@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { ChevronLeft, ChevronRight, Loader2, Star, Send, MessageCircle, BookOpen, ChevronDown, Clock } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Loader2, Star, Send, MessageCircle, BookOpen, ChevronDown, Clock, Library, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -20,11 +20,13 @@ import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface PoemClientProps {
   initialPoem: Poem;
   prevPoem: Poem | null;
   nextPoem: Poem | null;
+  allPoems: Poem[];
 }
 
 /**
@@ -50,7 +52,6 @@ function InteractiveWord({ word, meaning }: { word: string; meaning: string }) {
             }
           }}
           onClick={(e) => {
-            // On touch devices, toggle the state. On desktop, hover already handled it.
             if (typeof window !== 'undefined' && !window.matchMedia('(hover: hover)').matches) {
               setIsOpen(!isOpen);
             }
@@ -73,7 +74,6 @@ function InteractiveWord({ word, meaning }: { word: string; meaning: string }) {
 
 /**
  * InteractivePoem component to handle word-based meanings with soft marking and stable layout.
- * Underlines only the first occurrence of each vocabulary word.
  */
 function InteractivePoem({ text, vocabMap, isClient }: { text: string; vocabMap: Map<string, string>; isClient: boolean }) {
   if (!vocabMap.size) {
@@ -107,7 +107,7 @@ function InteractivePoem({ text, vocabMap, isClient }: { text: string; vocabMap:
   );
 }
 
-export function PoemClient({ initialPoem: poem, prevPoem, nextPoem }: PoemClientProps) {
+export function PoemClient({ initialPoem: poem, prevPoem, nextPoem, allPoems }: PoemClientProps) {
   const router = useRouter();
   const { toast } = useToast();
   const contentRef = useRef<HTMLDivElement>(null);
@@ -167,6 +167,23 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem }: PoemClient
     return wordsCount > 0 ? Math.max(1, Math.round(wordsCount / 200)) : 0;
   }, [poem.roman, poem.hindi, poem.urdu]);
 
+  const relatedPoems = useMemo(() => {
+    if (!allPoems.length) return [];
+    
+    const currentThemes = poem.theme.split(/[|,]+/).map(t => t.trim().toLowerCase());
+    
+    return allPoems
+      .filter(p => p.id !== poem.id)
+      .map(p => {
+        const pThemes = p.theme.split(/[|,]+/).map(t => t.trim().toLowerCase());
+        const shared = pThemes.filter(t => currentThemes.includes(t)).length;
+        return { ...p, sharedCount: shared };
+      })
+      .filter(p => p.sharedCount > 0)
+      .sort((a, b) => b.sharedCount - a.sharedCount || b.date.localeCompare(a.date))
+      .slice(0, 5);
+  }, [poem.id, poem.theme, allPoems]);
+
   useEffect(() => {
     const loadReviews = async () => {
       setLoadingReviews(true);
@@ -220,10 +237,16 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem }: PoemClient
 
   return (
     <div className="min-h-screen bg-background">
-      <motion.div
-        className="fixed top-0 left-0 right-0 h-[3px] bg-primary origin-left z-[60]"
-        style={{ scaleX }}
-      />
+      <AnimatePresence>
+        {mounted && (
+          <motion.div
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            className="fixed top-0 left-0 right-0 h-[3px] bg-primary origin-left z-[60]"
+            style={{ scaleX }}
+          />
+        )}
+      </AnimatePresence>
       <Navigation />
       
       <main className="max-w-6xl mx-auto px-4 md:px-6 py-12 md:py-24">
@@ -243,13 +266,59 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem }: PoemClient
             Archive
           </Button>
 
-          <header className="space-y-4 md:space-y-6 text-center">
+          <header className="space-y-4 md:space-y-6 text-center relative">
             <Badge variant="outline" className="font-normal tracking-[0.2em] border-primary/20 text-primary uppercase text-[8px] md:text-[10px] px-3">
               {poem.theme}
             </Badge>
-            <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-headline tracking-tight leading-tight px-2">
-              {poem.title}
-            </h1>
+            
+            <div className="flex items-center justify-center gap-4 group/title relative">
+              <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-headline tracking-tight leading-tight px-2">
+                {poem.title}
+              </h1>
+              
+              {mounted && relatedPoems.length > 0 && (
+                <TooltipProvider delayDuration={300}>
+                  <Tooltip>
+                    <Popover>
+                      <TooltipTrigger asChild>
+                        <PopoverTrigger asChild>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="w-8 h-8 md:w-10 md:h-10 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all shrink-0"
+                          >
+                            <Library className="w-4 h-4 md:w-5 md:h-5 opacity-40 group-hover/title:opacity-100 transition-opacity" />
+                          </Button>
+                        </PopoverTrigger>
+                      </TooltipTrigger>
+                      <PopoverContent className="w-64 p-0 bg-card/95 backdrop-blur-md border-border/50 shadow-2xl rounded-2xl overflow-hidden" align="center" side="bottom" sideOffset={12}>
+                        <div className="p-4 bg-primary/5 border-b border-border/30">
+                          <h4 className="text-[10px] uppercase tracking-[0.2em] font-medium text-primary/80">Related Echoes</h4>
+                        </div>
+                        <div className="max-h-80 overflow-y-auto custom-scrollbar">
+                          {relatedPoems.map((p) => (
+                            <Link 
+                              key={p.id} 
+                              href={`/poem/${p.id}`}
+                              className="block p-4 hover:bg-primary/5 transition-colors border-b border-border/10 last:border-none group/item"
+                            >
+                              <div className="space-y-1">
+                                <p className="text-sm font-headline group-hover/item:text-primary transition-colors line-clamp-1">{p.title}</p>
+                                <p className="text-[9px] uppercase tracking-widest text-muted-foreground/60">{p.theme}</p>
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                    <TooltipContent side="right" className="bg-card text-foreground border-border/50 hidden md:block">
+                      <p className="text-[10px] tracking-widest uppercase">Related Poems</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+            </div>
+
             <div className="flex flex-wrap items-center justify-center gap-2 text-muted-foreground font-light italic text-sm md:text-base">
               <span>by {poem.author}</span>
               <span className="hidden sm:inline opacity-30">|</span>
@@ -384,7 +453,7 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem }: PoemClient
 
           <section className="max-w-2xl mx-auto px-2 py-4">
             <div className="flex items-center justify-between gap-4">
-              <div className="flex-1">
+              <div className="flex-1 text-left">
                 {nextPoem && (
                   <Link 
                     href={`/poem/${nextPoem.id}`}
