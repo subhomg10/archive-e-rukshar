@@ -12,14 +12,14 @@ export function AboutClient() {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.3
+        staggerChildren: 0.1,
+        delayChildren: 0.2
       }
     }
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: 15 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] } }
   };
 
@@ -27,21 +27,21 @@ export function AboutClient() {
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      <main className="max-w-4xl mx-auto px-6 py-20 md:py-32">
+      <main className="max-w-4xl mx-auto px-6 py-16 md:py-24">
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="space-y-20 md:space-y-24"
+          className="space-y-12 md:space-y-16"
         >
           {/* Header */}
-          <motion.header variants={itemVariants} className="space-y-6 text-center">
+          <motion.header variants={itemVariants} className="space-y-4 text-center">
             <h1 className="text-5xl md:text-8xl font-headline tracking-tight">The Archive</h1>
             <p className="text-primary tracking-[0.3em] uppercase text-[10px] md:text-xs font-light">A Sanctuary for Narrative Verse</p>
           </motion.header>
 
           {/* Profile Identity */}
-          <motion.div variants={itemVariants} className="flex flex-col items-center space-y-8">
+          <motion.div variants={itemVariants} className="flex flex-col items-center space-y-6">
             <div className="relative group">
               <div className="absolute -inset-1 bg-gradient-to-tr from-primary/20 to-transparent rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
               <Avatar className="w-32 h-32 md:w-40 md:h-40 border-2 border-border/50 p-1.5 bg-background relative">
@@ -54,14 +54,14 @@ export function AboutClient() {
               </Avatar>
             </div>
             
-            <div className="text-center space-y-2">
-              <h3 className="text-3xl md:text-4xl font-headline tracking-tight">Rukshar</h3>
-              <p className="text-[10px] tracking-[0.4em] uppercase text-primary/60 font-medium">Poet & Storyteller</p>
+            <div className="text-center space-y-1">
+              <h3 className="text-2xl md:text-3xl font-headline tracking-tight">Rukshar</h3>
+              <p className="text-[9px] tracking-[0.4em] uppercase text-primary/60 font-medium">Poet & Storyteller</p>
             </div>
           </motion.div>
 
           {/* About Rukshar */}
-          <motion.section variants={itemVariants} className="space-y-8">
+          <motion.section variants={itemVariants} className="space-y-6">
             <div className="flex items-center gap-4 text-primary/60">
               <Sparkles className="w-4 h-4" />
               <h2 className="text-[10px] uppercase tracking-[0.3em] font-medium">About Rukshar</h2>
@@ -76,10 +76,10 @@ export function AboutClient() {
             </div>
           </motion.section>
 
-          <Separator className="bg-border/30 max-w-[100px] mx-auto" />
+          <Separator className="bg-border/20 max-w-[100px] mx-auto" />
 
           {/* Why This Archive Exists */}
-          <motion.section variants={itemVariants} className="space-y-8">
+          <motion.section variants={itemVariants} className="space-y-6">
             <div className="flex items-center gap-4 text-primary/60">
               <BookOpen className="w-4 h-4" />
               <h2 className="text-[10px] uppercase tracking-[0.3em] font-medium">The Purpose</h2>
@@ -94,10 +94,10 @@ export function AboutClient() {
             </div>
           </motion.section>
 
-          <Separator className="bg-border/30 max-w-[100px] mx-auto" />
+          <Separator className="bg-border/20 max-w-[100px] mx-auto" />
 
           {/* Writing Philosophy */}
-          <motion.section variants={itemVariants} className="space-y-8">
+          <motion.section variants={itemVariants} className="space-y-6">
             <div className="flex items-center gap-4 text-primary/60">
               <PenTool className="w-4 h-4" />
               <h2 className="text-[10px] uppercase tracking-[0.3em] font-medium">Philosophy</h2>
@@ -110,34 +110,36 @@ export function AboutClient() {
             </div>
           </motion.section>
 
-          {/* Contact Details Only */}
-          <motion.section variants={itemVariants} className="space-y-12">
-            <div className="text-center space-y-4">
+          <Separator className="bg-border/20 max-w-[100px] mx-auto" />
+
+          {/* Contact Details */}
+          <motion.section variants={itemVariants} className="space-y-10">
+            <div className="text-center space-y-3">
               <h2 className="text-2xl md:text-3xl font-headline">Connect with the Words</h2>
               <p className="text-sm text-muted-foreground font-light">For inquiries, collaborations, or shared reflections.</p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
               <a 
                 href="https://instagram.com/seventhsky._" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="group flex items-center justify-between p-6 rounded-2xl border border-border/50 bg-card/20 hover:border-primary/30 transition-all duration-500"
+                className="group flex items-center justify-between p-5 rounded-2xl border border-border/50 bg-card/20 hover:border-primary/30 transition-all duration-500"
               >
                 <div className="flex items-center gap-4">
                   <Instagram className="w-5 h-5 text-primary/60 group-hover:text-primary transition-colors" />
-                  <span className="text-sm font-light tracking-wide">@seventhsky._</span>
+                  <span className="text-xs md:text-sm font-light tracking-wide">@seventhsky._</span>
                 </div>
                 <Sparkles className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity text-primary" />
               </a>
               
               <a 
                 href="mailto:subhomghosh06@gmail.com"
-                className="group flex items-center justify-between p-6 rounded-2xl border border-border/50 bg-card/20 hover:border-primary/30 transition-all duration-500"
+                className="group flex items-center justify-between p-5 rounded-2xl border border-border/50 bg-card/20 hover:border-primary/30 transition-all duration-500"
               >
                 <div className="flex items-center gap-4">
                   <Mail className="w-5 h-5 text-primary/60 group-hover:text-primary transition-colors" />
-                  <span className="text-sm font-light tracking-wide">subhomghosh06@gmail.com</span>
+                  <span className="text-xs md:text-sm font-light tracking-wide">subhomghosh06@gmail.com</span>
                 </div>
                 <Sparkles className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity text-primary" />
               </a>
@@ -145,9 +147,9 @@ export function AboutClient() {
           </motion.section>
 
           {/* Closing Note */}
-          <motion.section variants={itemVariants} className="pt-20 text-center space-y-8">
-            <div className="h-px bg-gradient-to-r from-transparent via-border/50 to-transparent w-full" />
-            <p className="font-headline italic text-xl md:text-3xl text-foreground/80 max-w-none mx-auto leading-relaxed whitespace-nowrap">
+          <motion.section variants={itemVariants} className="pt-12 text-center space-y-6">
+            <div className="h-px bg-gradient-to-r from-transparent via-border/30 to-transparent w-full" />
+            <p className="font-headline italic text-xl md:text-3xl text-foreground/80 max-w-none mx-auto leading-relaxed">
               "I do not write about objects. I write about the lives they witness."
             </p>
             <p className="text-[10px] tracking-[0.5em] uppercase text-muted-foreground/50">— Rukshar</p>
@@ -156,7 +158,7 @@ export function AboutClient() {
         </motion.div>
       </main>
 
-      <footer className="max-w-7xl mx-auto px-6 py-12 md:py-20 text-center opacity-30">
+      <footer className="max-w-7xl mx-auto px-6 py-12 text-center opacity-30">
         <p className="text-[8px] md:text-[10px] tracking-[0.5em] uppercase text-muted-foreground">Rukshar's Archive &copy; {new Date().getFullYear()}</p>
       </footer>
     </div>
