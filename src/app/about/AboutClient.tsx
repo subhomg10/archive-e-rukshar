@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Navigation } from '@/components/Navigation';
 import { motion } from 'framer-motion';
-import { BookOpen, PenTool, Sparkles, Star, ArrowRight } from 'lucide-react';
+import { BookOpen, PenTool, Sparkles, Star, Heart, ArrowRight } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -130,7 +130,7 @@ export function AboutClient() {
           {favoritePoem && (
             <motion.section variants={itemVariants} className="space-y-8 pt-8">
               <div className="flex items-center gap-4 text-primary/60">
-                <Star className="w-4 h-4" />
+                <Heart className="w-4 h-4" />
                 <h2 className="text-[10px] uppercase tracking-[0.3em] font-medium">Favorite Poem</h2>
               </div>
               
