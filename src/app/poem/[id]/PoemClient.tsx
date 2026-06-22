@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useMemo, useRef } from 'react';
@@ -50,9 +51,9 @@ function InteractivePoem({ text, vocabMap }: { text: string; vocabMap: Map<strin
   const lines = text.split('\n');
 
   return (
-    <div className="space-y-1">
+    <div className="space-y-1 text-center">
       {lines.map((line, lineIdx) => (
-        <div key={`line-${lineIdx}`} className="min-h-[1.5em] leading-[2]">
+        <div key={`line-${lineIdx}`} className="min-h-[1.5em] leading-[2] text-center">
           {line.split(regex).map((part, partIdx) => {
             const lowerPart = part.toLowerCase();
             const meaning = vocabMap.get(lowerPart);
@@ -327,7 +328,7 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem }: PoemClient
                       className="overflow-hidden"
                     >
                       <div className="p-6 md:p-8 rounded-2xl bg-card/10 border border-border/20">
-                        <div className="text-sm md:text-base font-light leading-relaxed text-muted-foreground whitespace-pre-line italic">
+                        <div className="text-sm md:text-base font-light leading-relaxed text-muted-foreground whitespace-pre-line italic text-center">
                           {poem.vocabulary}
                         </div>
                       </div>
