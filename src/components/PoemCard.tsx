@@ -59,7 +59,7 @@ export function PoemCard({ poem, index }: PoemCardProps) {
                     <TooltipProvider delayDuration={300}>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <Badge variant="secondary" className="text-[10px] uppercase tracking-widest bg-primary/25 text-foreground/90 font-normal py-0.5 shrink-0 px-2 w-fit cursor-default border-none">
+                          <Badge variant="secondary" className="text-[10px] uppercase tracking-widest bg-primary/10 text-primary font-normal py-0.5 shrink-0 px-2 w-fit cursor-default border-none">
                             <Sparkle className="w-2.5 h-2.5 mr-1 fill-current" />
                             Author's Favorite
                           </Badge>

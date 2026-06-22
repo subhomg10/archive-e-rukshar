@@ -264,7 +264,7 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem, allPoems }: 
 
           <header className="space-y-4 md:space-y-6 text-center relative">
             {poem.favorite && (
-              <div className="flex items-center justify-center gap-2 text-primary/80 animate-in fade-in slide-in-from-top-2 duration-1000 mb-2">
+              <div className="flex items-center justify-center gap-2 text-primary animate-in fade-in slide-in-from-top-2 duration-1000 mb-2">
                 <Sparkle className="w-3 h-3 fill-current" />
                 <span className="text-[9px] uppercase tracking-[0.4em] font-medium">Author's Favorite</span>
               </div>
