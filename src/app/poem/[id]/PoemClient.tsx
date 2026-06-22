@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Navigation } from '@/components/Navigation';
 import { Poem, Review } from '@/lib/types';
@@ -87,9 +87,14 @@ function InteractivePoem({ text, vocabMap }: { text: string; vocabMap: Map<strin
 export function PoemClient({ initialPoem: poem }: PoemClientProps) {
   const router = useRouter();
   const { toast } = useToast();
+  const contentRef = useRef<HTMLDivElement>(null);
   
-  // Progress Bar Logic
-  const { scrollYProgress } = useScroll();
+  // Progress Bar Logic - targeted to the poem content area
+  const { scrollYProgress } = useScroll({
+    target: contentRef,
+    offset: ["start center", "end center"]
+  });
+  
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
     damping: 30,
@@ -226,44 +231,46 @@ export function PoemClient({ initialPoem: poem }: PoemClientProps) {
 
           <Separator className="bg-border/30 max-w-[100px] mx-auto" />
 
-          {/* Poem Content Tabs */}
-          <Tabs defaultValue="roman" className="w-full">
-            <div className="flex justify-center mb-8 md:mb-12">
-              <TabsList className="bg-card/50 border border-border/50 rounded-full h-auto p-1 flex-wrap justify-center">
-                <TabsTrigger value="roman" className="rounded-full px-4 md:px-6 py-1.5 md:py-2 text-[10px] md:text-xs uppercase tracking-widest">Roman</TabsTrigger>
-                {poem.hindi && <TabsTrigger value="hindi" className="rounded-full px-4 md:px-6 py-1.5 md:py-2 text-[10px] md:text-xs uppercase tracking-widest">Hindi</TabsTrigger>}
-                {poem.urdu && <TabsTrigger value="urdu" className="rounded-full px-4 md:px-6 py-1.5 md:py-2 text-[10px] md:text-xs uppercase tracking-widest">Urdu</TabsTrigger>}
-              </TabsList>
-            </div>
+          {/* Poem Content Tabs - Tracking Ref Attached Here */}
+          <div ref={contentRef} className="py-8">
+            <Tabs defaultValue="roman" className="w-full">
+              <div className="flex justify-center mb-8 md:mb-12">
+                <TabsList className="bg-card/50 border border-border/50 rounded-full h-auto p-1 flex-wrap justify-center">
+                  <TabsTrigger value="roman" className="rounded-full px-4 md:px-6 py-1.5 md:py-2 text-[10px] md:text-xs uppercase tracking-widest">Roman</TabsTrigger>
+                  {poem.hindi && <TabsTrigger value="hindi" className="rounded-full px-4 md:px-6 py-1.5 md:py-2 text-[10px] md:text-xs uppercase tracking-widest">Hindi</TabsTrigger>}
+                  {poem.urdu && <TabsTrigger value="urdu" className="rounded-full px-4 md:px-6 py-1.5 md:py-2 text-[10px] md:text-xs uppercase tracking-widest">Urdu</TabsTrigger>}
+                </TabsList>
+              </div>
 
-            <TabsContent value="roman">
-              <article className="reading-container px-2">
-                <div className="font-headline text-lg sm:text-xl md:text-2xl leading-[1.8] md:leading-[2] text-foreground/90 font-medium text-center">
-                  <InteractivePoem text={poem.roman} vocabMap={vocabMap} />
-                </div>
-              </article>
-            </TabsContent>
-            
-            {poem.hindi && (
-              <TabsContent value="hindi">
+              <TabsContent value="roman">
                 <article className="reading-container px-2">
-                  <div className="font-headline text-lg sm:text-xl md:text-2xl leading-[1.8] md:leading-[2] whitespace-pre-line text-foreground/90 font-medium text-center">
-                    {poem.hindi}
+                  <div className="font-headline text-lg sm:text-xl md:text-2xl leading-[1.8] md:leading-[2] text-foreground/90 font-medium text-center">
+                    <InteractivePoem text={poem.roman} vocabMap={vocabMap} />
                   </div>
                 </article>
               </TabsContent>
-            )}
+              
+              {poem.hindi && (
+                <TabsContent value="hindi">
+                  <article className="reading-container px-2">
+                    <div className="font-headline text-lg sm:text-xl md:text-2xl leading-[1.8] md:leading-[2] whitespace-pre-line text-foreground/90 font-medium text-center">
+                      {poem.hindi}
+                    </div>
+                  </article>
+                </TabsContent>
+              )}
 
-            {poem.urdu && (
-              <TabsContent value="urdu">
-                <article className="reading-container px-2">
-                  <div className="font-headline text-lg sm:text-xl md:text-2xl leading-[1.8] md:leading-[2] whitespace-pre-line text-foreground/90 font-medium text-center dir-rtl">
-                    {poem.urdu}
-                  </div>
-                </article>
-              </TabsContent>
-            )}
-          </Tabs>
+              {poem.urdu && (
+                <TabsContent value="urdu">
+                  <article className="reading-container px-2">
+                    <div className="font-headline text-lg sm:text-xl md:text-2xl leading-[1.8] md:leading-[2] whitespace-pre-line text-foreground/90 font-medium text-center dir-rtl">
+                      {poem.urdu}
+                    </div>
+                  </article>
+                </TabsContent>
+              )}
+            </Tabs>
+          </div>
 
           <Separator className="bg-border/30 max-w-[80px] md:max-w-[100px] mx-auto" />
 
