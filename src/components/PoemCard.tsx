@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Poem } from '@/lib/types';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, ArrowRight, Star, Heart } from 'lucide-react';
+import { Calendar, ArrowRight, Star, Sparkle } from 'lucide-react';
 import {
   Tooltip,
   TooltipContent,
@@ -59,8 +59,8 @@ export function PoemCard({ poem, index }: PoemCardProps) {
                     <TooltipProvider delayDuration={300}>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <Badge variant="outline" className="text-[10px] uppercase tracking-widest border-primary/30 text-foreground/90 font-normal py-0.5 shrink-0 px-2 w-fit cursor-default bg-primary/[0.03]">
-                            <Heart className="w-2.5 h-2.5 mr-1" />
+                          <Badge variant="secondary" className="text-[10px] uppercase tracking-widest bg-primary/25 text-foreground/90 font-normal py-0.5 shrink-0 px-2 w-fit cursor-default border-none">
+                            <Sparkle className="w-2.5 h-2.5 mr-1 fill-current" />
                             Author's Favorite
                           </Badge>
                         </TooltipTrigger>

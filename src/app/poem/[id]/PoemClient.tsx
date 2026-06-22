@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { ChevronLeft, ChevronRight, Loader2, Star, Heart, Send, MessageCircle, BookOpen, ChevronDown, Clock } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Loader2, Star, Send, MessageCircle, BookOpen, ChevronDown, Clock, Sparkle } from 'lucide-react';
 import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -264,8 +264,8 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem, allPoems }: 
 
           <header className="space-y-4 md:space-y-6 text-center relative">
             {poem.favorite && (
-              <div className="flex items-center justify-center gap-2 text-primary/70 animate-in fade-in slide-in-from-top-2 duration-1000 mb-2">
-                <Heart className="w-3 h-3" />
+              <div className="flex items-center justify-center gap-2 text-primary/80 animate-in fade-in slide-in-from-top-2 duration-1000 mb-2">
+                <Sparkle className="w-3 h-3 fill-current" />
                 <span className="text-[9px] uppercase tracking-[0.4em] font-medium">Author's Favorite</span>
               </div>
             )}
