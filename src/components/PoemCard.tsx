@@ -6,6 +6,12 @@ import { Poem } from '@/lib/types';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, ArrowRight, Star } from 'lucide-react';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface PoemCardProps {
   poem: Poem;
@@ -48,6 +54,21 @@ export function PoemCard({ poem, index }: PoemCardProps) {
                       <Star className="w-2.5 h-2.5 mr-1 fill-primary" />
                       Featured
                     </Badge>
+                  )}
+                  {poem.favorite && (
+                    <TooltipProvider delayDuration={300}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Badge variant="secondary" className="text-[10px] uppercase tracking-widest bg-primary/10 text-primary font-normal py-0.5 border-none shrink-0 px-2 w-fit cursor-default">
+                            <Star className="w-2.5 h-2.5 mr-1 fill-primary" />
+                            Author's Favorite
+                          </Badge>
+                        </TooltipTrigger>
+                        <TooltipContent className="bg-card text-foreground border-border/50 text-[10px] tracking-widest uppercase py-2">
+                          One of the author's most cherished poems
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   )}
                 </div>
                 <div className="flex items-center text-[10px] text-muted-foreground uppercase tracking-widest font-body shrink-0 whitespace-nowrap mt-1">
