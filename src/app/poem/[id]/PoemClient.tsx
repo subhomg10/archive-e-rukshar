@@ -31,7 +31,7 @@ interface PoemClientProps {
  * InteractivePoem component to handle word-based meanings with soft marking and stable layout.
  * Underlines only the first occurrence of each vocabulary word to keep the reading experience clean.
  */
-function InteractivePoem({ text, vocabMap }: { text: string; vocabMap: Map<string, string> }) {
+function InteractivePoem({ text, vocabMap, isClient }: { text: string; vocabMap: Map<string, string>; isClient: boolean }) {
   if (!vocabMap.size) {
     return <div className="whitespace-pre-line text-center">{text}</div>;
   }
@@ -59,7 +59,8 @@ function InteractivePoem({ text, vocabMap }: { text: string; vocabMap: Map<strin
             const meaning = vocabMap.get(lowerPart);
             
             // Highlight only if it's a vocab word AND it's the first time we're seeing it
-            if (meaning && !seenWords.has(lowerPart)) {
+            // ONLY use Popover if we are on the client to avoid hydration mismatch
+            if (meaning && !seenWords.has(lowerPart) && isClient) {
               seenWords.add(lowerPart);
               return (
                 <Popover key={`pop-${lineIdx}-${partIdx}`}>
@@ -91,7 +92,12 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem }: PoemClient
   const router = useRouter();
   const { toast } = useToast();
   const contentRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
   
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // Progress Bar Logic - targeted to the poem content area
   const { scrollYProgress } = useScroll({
     target: contentRef,
@@ -253,43 +259,51 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem }: PoemClient
 
           {/* Poem Content Tabs - Tracking Ref Attached Here */}
           <div ref={contentRef} className="py-8">
-            <Tabs defaultValue="roman" className="w-full">
-              <div className="flex justify-center mb-8 md:mb-12">
-                <TabsList className="bg-card/50 border border-border/50 rounded-full h-auto p-1 flex-wrap justify-center">
-                  <TabsTrigger value="roman" className="rounded-full px-4 md:px-6 py-1.5 md:py-2 text-[10px] md:text-xs uppercase tracking-widest">Roman</TabsTrigger>
-                  {poem.hindi && <TabsTrigger value="hindi" className="rounded-full px-4 md:px-6 py-1.5 md:py-2 text-[10px] md:text-xs uppercase tracking-widest">Hindi</TabsTrigger>}
-                  {poem.urdu && <TabsTrigger value="urdu" className="rounded-full px-4 md:px-6 py-1.5 md:py-2 text-[10px] md:text-xs uppercase tracking-widest">Urdu</TabsTrigger>}
-                </TabsList>
-              </div>
+            {!mounted ? (
+              <article className="reading-container px-2">
+                <div className="font-headline text-lg sm:text-xl md:text-2xl leading-[1.8] md:leading-[2] whitespace-pre-line text-foreground/90 font-medium text-center">
+                  {poem.roman}
+                </div>
+              </article>
+            ) : (
+              <Tabs defaultValue="roman" className="w-full">
+                <div className="flex justify-center mb-8 md:mb-12">
+                  <TabsList className="bg-card/50 border border-border/50 rounded-full h-auto p-1 flex-wrap justify-center">
+                    <TabsTrigger value="roman" className="rounded-full px-4 md:px-6 py-1.5 md:py-2 text-[10px] md:text-xs uppercase tracking-widest">Roman</TabsTrigger>
+                    {poem.hindi && <TabsTrigger value="hindi" className="rounded-full px-4 md:px-6 py-1.5 md:py-2 text-[10px] md:text-xs uppercase tracking-widest">Hindi</TabsTrigger>}
+                    {poem.urdu && <TabsTrigger value="urdu" className="rounded-full px-4 md:px-6 py-1.5 md:py-2 text-[10px] md:text-xs uppercase tracking-widest">Urdu</TabsTrigger>}
+                  </TabsList>
+                </div>
 
-              <TabsContent value="roman">
-                <article className="reading-container px-2">
-                  <div className="font-headline text-lg sm:text-xl md:text-2xl leading-[1.8] md:leading-[2] text-foreground/90 font-medium">
-                    <InteractivePoem text={poem.roman} vocabMap={vocabMap} />
-                  </div>
-                </article>
-              </TabsContent>
-              
-              {poem.hindi && (
-                <TabsContent value="hindi">
+                <TabsContent value="roman">
                   <article className="reading-container px-2">
-                    <div className="font-headline text-lg sm:text-xl md:text-2xl leading-[1.8] md:leading-[2] whitespace-pre-line text-foreground/90 font-medium text-center">
-                      {poem.hindi}
+                    <div className="font-headline text-lg sm:text-xl md:text-2xl leading-[1.8] md:leading-[2] text-foreground/90 font-medium">
+                      <InteractivePoem text={poem.roman} vocabMap={vocabMap} isClient={mounted} />
                     </div>
                   </article>
                 </TabsContent>
-              )}
+                
+                {poem.hindi && (
+                  <TabsContent value="hindi">
+                    <article className="reading-container px-2">
+                      <div className="font-headline text-lg sm:text-xl md:text-2xl leading-[1.8] md:leading-[2] whitespace-pre-line text-foreground/90 font-medium text-center">
+                        {poem.hindi}
+                      </div>
+                    </article>
+                  </TabsContent>
+                )}
 
-              {poem.urdu && (
-                <TabsContent value="urdu">
-                  <article className="reading-container px-2">
-                    <div className="font-headline text-lg sm:text-xl md:text-2xl leading-[1.8] md:leading-[2] whitespace-pre-line text-foreground/90 font-medium text-center dir-rtl">
-                      {poem.urdu}
-                    </div>
-                  </article>
-                </TabsContent>
-              )}
-            </Tabs>
+                {poem.urdu && (
+                  <TabsContent value="urdu">
+                    <article className="reading-container px-2">
+                      <div className="font-headline text-lg sm:text-xl md:text-2xl leading-[1.8] md:leading-[2] whitespace-pre-line text-foreground/90 font-medium text-center dir-rtl">
+                        {poem.urdu}
+                      </div>
+                    </article>
+                  </TabsContent>
+                )}
+              </Tabs>
+            )}
           </div>
 
           <Separator className="bg-border/30 max-w-[80px] md:max-w-[100px] mx-auto" />
