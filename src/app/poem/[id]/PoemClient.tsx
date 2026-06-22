@@ -345,34 +345,34 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem }: PoemClient
           <section className="max-w-2xl mx-auto px-2 py-4">
             <div className="flex items-center justify-between gap-4">
               <div className="flex-1">
-                {prevPoem && (
+                {nextPoem && (
                   <Link 
-                    href={`/poem/${prevPoem.id}`}
+                    href={`/poem/${nextPoem.id}`}
                     className="group flex flex-col items-start space-y-2 hover:opacity-80 transition-opacity"
                   >
                     <span className="text-[9px] uppercase tracking-[0.2em] text-primary/60 flex items-center gap-1">
                       <ChevronLeft className="w-3 h-3 group-hover:-translate-x-1 transition-transform" />
-                      Previous Fragment
+                      Next Fragment
                     </span>
                     <span className="font-headline text-lg sm:text-xl line-clamp-1 group-hover:text-primary transition-colors">
-                      {prevPoem.title}
+                      {nextPoem.title}
                     </span>
                   </Link>
                 )}
               </div>
               
               <div className="flex-1 text-right">
-                {nextPoem && (
+                {prevPoem && (
                   <Link 
-                    href={`/poem/${nextPoem.id}`}
+                    href={`/poem/${prevPoem.id}`}
                     className="group flex flex-col items-end space-y-2 hover:opacity-80 transition-opacity"
                   >
                     <span className="text-[9px] uppercase tracking-[0.2em] text-primary/60 flex items-center gap-1">
-                      Next Fragment
+                      Previous Fragment
                       <ChevronRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
                     </span>
                     <span className="font-headline text-lg sm:text-xl line-clamp-1 group-hover:text-primary transition-colors">
-                      {nextPoem.title}
+                      {prevPoem.title}
                     </span>
                   </Link>
                 )}
