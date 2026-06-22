@@ -1,8 +1,8 @@
-
 "use client";
 
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Navigation } from '@/components/Navigation';
 import { Poem, Review } from '@/lib/types';
 import { fetchReviews, addReview } from '@/lib/supabase-client';
@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { ChevronLeft, Loader2, Star, Send, MessageCircle, BookOpen, ChevronDown } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Loader2, Star, Send, MessageCircle, BookOpen, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -22,6 +22,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 
 interface PoemClientProps {
   initialPoem: Poem;
+  prevPoem: Poem | null;
+  nextPoem: Poem | null;
 }
 
 /**
@@ -30,7 +32,7 @@ interface PoemClientProps {
  */
 function InteractivePoem({ text, vocabMap }: { text: string; vocabMap: Map<string, string> }) {
   if (!vocabMap.size) {
-    return <div className="whitespace-pre-line">{text}</div>;
+    return <div className="whitespace-pre-line text-center">{text}</div>;
   }
 
   // Track words that have already been highlighted in this render
@@ -67,7 +69,7 @@ function InteractivePoem({ text, vocabMap }: { text: string; vocabMap: Map<strin
                   </PopoverTrigger>
                   <PopoverContent 
                     side="bottom" 
-                    className="w-auto max-w-[240px] p-3 bg-card/95 backdrop-blur-md border-border/50 shadow-xl rounded-xl"
+                    className="w-auto max-w-[240px] p-3 bg-card/95 backdrop-blur-md border-border/50 shadow-xl rounded-xl z-[70]"
                   >
                     <p className="text-xs md:text-sm font-light italic text-primary leading-relaxed">
                       {meaning}
@@ -84,7 +86,7 @@ function InteractivePoem({ text, vocabMap }: { text: string; vocabMap: Map<strin
   );
 }
 
-export function PoemClient({ initialPoem: poem }: PoemClientProps) {
+export function PoemClient({ initialPoem: poem, prevPoem, nextPoem }: PoemClientProps) {
   const router = useRouter();
   const { toast } = useToast();
   const contentRef = useRef<HTMLDivElement>(null);
@@ -205,7 +207,7 @@ export function PoemClient({ initialPoem: poem }: PoemClientProps) {
           <Button 
             variant="ghost" 
             size="sm" 
-            onClick={() => router.back()}
+            onClick={() => router.push('/archive')}
             className="text-muted-foreground hover:text-primary transition-colors -ml-3 group h-8"
           >
             <ChevronLeft className="w-4 h-4 mr-1 group-hover:-translate-x-1 transition-transform" />
@@ -244,7 +246,7 @@ export function PoemClient({ initialPoem: poem }: PoemClientProps) {
 
               <TabsContent value="roman">
                 <article className="reading-container px-2">
-                  <div className="font-headline text-lg sm:text-xl md:text-2xl leading-[1.8] md:leading-[2] text-foreground/90 font-medium text-center">
+                  <div className="font-headline text-lg sm:text-xl md:text-2xl leading-[1.8] md:leading-[2] text-foreground/90 font-medium">
                     <InteractivePoem text={poem.roman} vocabMap={vocabMap} />
                   </div>
                 </article>
@@ -335,6 +337,47 @@ export function PoemClient({ initialPoem: poem }: PoemClientProps) {
               </section>
             </>
           )}
+
+          <Separator className="bg-border/30 max-w-[80px] md:max-w-[100px] mx-auto" />
+
+          {/* Poem Navigation */}
+          <section className="max-w-2xl mx-auto px-2 py-4">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex-1">
+                {prevPoem && (
+                  <Link 
+                    href={`/poem/${prevPoem.id}`}
+                    className="group flex flex-col items-start space-y-2 hover:opacity-80 transition-opacity"
+                  >
+                    <span className="text-[9px] uppercase tracking-[0.2em] text-primary/60 flex items-center gap-1">
+                      <ChevronLeft className="w-3 h-3 group-hover:-translate-x-1 transition-transform" />
+                      Previous Fragment
+                    </span>
+                    <span className="font-headline text-lg sm:text-xl line-clamp-1 group-hover:text-primary transition-colors">
+                      {prevPoem.title}
+                    </span>
+                  </Link>
+                )}
+              </div>
+              
+              <div className="flex-1 text-right">
+                {nextPoem && (
+                  <Link 
+                    href={`/poem/${nextPoem.id}`}
+                    className="group flex flex-col items-end space-y-2 hover:opacity-80 transition-opacity"
+                  >
+                    <span className="text-[9px] uppercase tracking-[0.2em] text-primary/60 flex items-center gap-1">
+                      Next Fragment
+                      <ChevronRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                    </span>
+                    <span className="font-headline text-lg sm:text-xl line-clamp-1 group-hover:text-primary transition-colors">
+                      {nextPoem.title}
+                    </span>
+                  </Link>
+                )}
+              </div>
+            </div>
+          </section>
 
           <Separator className="bg-border/30 max-w-[80px] md:max-w-[100px] mx-auto" />
 

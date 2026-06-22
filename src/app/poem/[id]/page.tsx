@@ -1,4 +1,4 @@
-import { fetchPoemById } from '@/lib/supabase-client';
+import { fetchPoemById, fetchPoems } from '@/lib/supabase-client';
 import { PoemClient } from './PoemClient';
 import { Metadata, ResolvingMetadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -50,6 +50,16 @@ export default async function PoemPage({ params }: Props) {
     notFound();
   }
 
+  // Fetch all poems to determine navigation neighbors
+  // Navigation follows the default sort (date descending)
+  const allPoems = await fetchPoems();
+  const currentIndex = allPoems.findIndex(p => p.id === id);
+  
+  // "Next" is newer (previous index in descending list)
+  // "Previous" is older (next index in descending list)
+  const nextPoem = currentIndex > 0 ? allPoems[currentIndex - 1] : null;
+  const prevPoem = currentIndex < allPoems.length - 1 && currentIndex !== -1 ? allPoems[currentIndex + 1] : null;
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "CreativeWork",
@@ -70,7 +80,11 @@ export default async function PoemPage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <PoemClient initialPoem={poem} />
+      <PoemClient 
+        initialPoem={poem} 
+        prevPoem={prevPoem}
+        nextPoem={nextPoem}
+      />
     </>
   );
 }
