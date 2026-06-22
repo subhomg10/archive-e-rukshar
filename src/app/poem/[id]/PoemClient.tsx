@@ -271,7 +271,7 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem, allPoems }: 
               {poem.theme}
             </Badge>
             
-            <div className="flex items-center justify-center gap-4 group/title relative">
+            <div className="flex items-center justify-center gap-5 group/title relative">
               <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-headline tracking-tight leading-tight px-2">
                 {poem.title}
               </h1>
@@ -285,9 +285,18 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem, allPoems }: 
                           <Button 
                             variant="ghost" 
                             size="icon" 
-                            className="w-8 h-8 md:w-10 md:h-10 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all shrink-0"
+                            className="w-10 h-10 md:w-12 md:h-12 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/5 hover:scale-110 transition-all shrink-0 active:scale-95"
                           >
-                            <Library className="w-4 h-4 md:w-5 md:h-5 opacity-40 group-hover/title:opacity-100 transition-opacity" />
+                            <svg 
+                              xmlns="http://www.w3.org/2000/svg" 
+                              height="24px" 
+                              viewBox="0 -960 960 960" 
+                              width="24px" 
+                              fill="currentColor"
+                              className="w-6 h-6 md:w-7 md:h-7 opacity-50 group-hover/title:opacity-100 transition-opacity"
+                            >
+                              <path d="M120-240v-80h520v80H120Zm664-40L584-480l200-200 56 56-144 144 144 144-56 56ZM120-440v-80h400v80H120Zm0-200v-80h520v80H120Z"/>
+                            </svg>
                           </Button>
                         </PopoverTrigger>
                       </TooltipTrigger>
@@ -312,7 +321,7 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem, allPoems }: 
                       </PopoverContent>
                     </Popover>
                     <TooltipContent side="right" className="bg-card text-foreground border-border/50 hidden md:block">
-                      <p className="text-[10px] tracking-widest uppercase">Related Poems</p>
+                      <p className="text-[10px] tracking-widest uppercase">Show Related Poems</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
