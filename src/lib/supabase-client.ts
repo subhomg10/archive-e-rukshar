@@ -117,7 +117,22 @@ export const fetchFeaturedPoems = async (): Promise<Poem[]> => {
   }
   
   const poems = (response.data || []) as Poem[];
-  return sortPoems(poems);
+  
+  // Apply specific sorting for Featured Echoes:
+  // 1. Sort all featured poems by date descending first.
+  const sortedByDate = sortPoems(poems);
+  
+  // 2. Find the favorite poem among the featured ones.
+  const favoriteIndex = sortedByDate.findIndex(p => p.favorite);
+  
+  if (favoriteIndex !== -1) {
+    // 3. Move the favorite to the top of the list.
+    const favorite = sortedByDate[favoriteIndex];
+    const others = sortedByDate.filter((_, idx) => idx !== favoriteIndex);
+    return [favorite, ...others];
+  }
+  
+  return sortedByDate;
 };
 
 export const fetchArchiveStats = async () => {
