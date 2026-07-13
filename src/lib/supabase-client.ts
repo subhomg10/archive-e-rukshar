@@ -102,7 +102,7 @@ export const fetchThemes = async (): Promise<string[]> => {
     }
   });
   
-  return Array.from(themeMap.values()).sort((a, b) => a.compareLocale(b));
+  return Array.from(themeMap.values()).sort((a, b) => a.localeCompare(b));
 };
 
 export const fetchFeaturedPoems = async (): Promise<Poem[]> => {
