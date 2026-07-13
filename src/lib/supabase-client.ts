@@ -64,19 +64,18 @@ export const fetchPoemById = async (id: string): Promise<Poem | null> => {
   return data as Poem;
 };
 
-export const fetchFavoritePoem = async (): Promise<Poem | null> => {
+export const fetchFavoritePoems = async (): Promise<Poem[]> => {
   const { data, error } = await supabase
     .from('poems')
     .select('*')
-    .eq('favorite', true)
-    .limit(1)
-    .maybeSingle();
+    .eq('favorite', true);
 
   if (error) {
-    console.error("fetchFavoritePoem Error:", error.message);
-    return null;
+    console.error("fetchFavoritePoems Error:", error.message);
+    return [];
   }
-  return data as Poem;
+  const poems = (data || []) as Poem[];
+  return sortPoems(poems);
 };
 
 export const fetchThemes = async (): Promise<string[]> => {
@@ -118,9 +117,6 @@ export const fetchFeaturedPoems = async (): Promise<Poem[]> => {
   
   const poems = (response.data || []) as Poem[];
   
-  // Apply specific sorting for Featured Echoes:
-  // 1. Sort primarily by 'favorite' status (true first)
-  // 2. Then sort by date descending (newest first)
   const sortedFeatured = [...poems].sort((a, b) => {
     if (a.favorite && !b.favorite) return -1;
     if (!a.favorite && b.favorite) return 1;
