@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import Link from 'next/navigation';
 import { Navigation } from '@/components/Navigation';
 import { Poem, Review } from '@/lib/types';
 import { fetchReviews, addReview } from '@/lib/supabase-client';
@@ -82,7 +82,7 @@ function InteractivePoem({ text, vocabMap, isClient }: { text: string; vocabMap:
   return (
     <div className="space-y-1 text-center">
       {lines.map((line, lineIdx) => (
-        <div key={`line-${lineIdx}`} className="min-h-[1.5em] leading-[2] text-center">
+        <div key={`line-${lineIdx}`} className="min-h-[1.5em] leading-[1.8] md:leading-[2] text-center">
           {line.split(regex).map((part, partIdx) => {
             const lowerPart = part.toLowerCase();
             const meaning = vocabMap.get(lowerPart);
@@ -245,7 +245,7 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem, allPoems }: 
       </AnimatePresence>
       <Navigation />
       
-      <main className="max-w-6xl mx-auto px-4 md:px-6 py-12 md:py-24">
+      <main className="max-w-6xl mx-auto px-3 md:px-6 py-12 md:py-24">
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -361,8 +361,8 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem, allPoems }: 
 
           <div ref={contentRef} className="py-8">
             {!mounted ? (
-              <article className="reading-container px-2">
-                <div className="font-headline text-lg sm:text-xl md:text-2xl leading-[1.8] md:leading-[2] whitespace-pre-line text-foreground/90 font-medium text-center">
+              <article className="reading-container px-0 md:px-2">
+                <div className="font-headline text-[17px] sm:text-xl md:text-2xl leading-[1.7] md:leading-[2] whitespace-pre-line text-foreground/90 font-medium text-center">
                   {poem.roman}
                 </div>
               </article>
@@ -377,8 +377,8 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem, allPoems }: 
                 </div>
 
                 <TabsContent value="roman">
-                  <article className="reading-container px-2">
-                    <div className="font-headline text-lg sm:text-xl md:text-2xl leading-[1.8] md:leading-[2] text-foreground/90 font-medium">
+                  <article className="reading-container px-0 md:px-2">
+                    <div className="font-headline text-[17px] sm:text-xl md:text-2xl leading-[1.7] md:leading-[2] text-foreground/90 font-medium">
                       <InteractivePoem text={poem.roman} vocabMap={vocabMap} isClient={mounted} />
                     </div>
                   </article>
@@ -386,8 +386,8 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem, allPoems }: 
                 
                 {poem.hindi && (
                   <TabsContent value="hindi">
-                    <article className="reading-container px-2">
-                      <div className="font-headline text-lg sm:text-xl md:text-2xl leading-[1.8] md:leading-[2] whitespace-pre-line text-foreground/90 font-medium text-center">
+                    <article className="reading-container px-0 md:px-2">
+                      <div className="font-headline text-[17px] sm:text-xl md:text-2xl leading-[1.7] md:leading-[2] whitespace-pre-line text-foreground/90 font-medium text-center">
                         {poem.hindi}
                       </div>
                     </article>
@@ -396,8 +396,8 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem, allPoems }: 
 
                 {poem.urdu && (
                   <TabsContent value="urdu">
-                    <article className="reading-container px-2">
-                      <div className="font-headline text-lg sm:text-xl md:text-2xl leading-[1.8] md:leading-[2] whitespace-pre-line text-foreground/90 font-medium text-center dir-rtl">
+                    <article className="reading-container px-0 md:px-2">
+                      <div className="font-headline text-[17px] sm:text-xl md:text-2xl leading-[1.7] md:leading-[2] whitespace-pre-line text-foreground/90 font-medium text-center dir-rtl">
                         {poem.urdu}
                       </div>
                     </article>
