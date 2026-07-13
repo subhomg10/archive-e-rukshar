@@ -6,6 +6,26 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+/**
+ * Helper to parse DD-MM-YYYY string into a sortable number (timestamp)
+ */
+const parseDateString = (dateStr: string): number => {
+  const parts = dateStr.split('-');
+  if (parts.length !== 3) return 0;
+  const day = parseInt(parts[0], 10);
+  const month = parseInt(parts[1], 10);
+  const year = parseInt(parts[2], 10);
+  // Note: month is 0-indexed in JS Date
+  return new Date(year, month - 1, day).getTime();
+};
+
+/**
+ * Helper to sort poems by date descending (newest first)
+ */
+const sortPoems = (poems: Poem[]): Poem[] => {
+  return [...poems].sort((a, b) => parseDateString(b.date) - parseDateString(a.date));
+};
+
 export const fetchPoems = async (filter?: { theme?: string; search?: string }): Promise<Poem[]> => {
   let query = supabase.from('poems').select('*');
 
@@ -18,14 +38,15 @@ export const fetchPoems = async (filter?: { theme?: string; search?: string }): 
     query = query.or(`title.ilike.%${s}%,theme.ilike.%${s}%,roman.ilike.%${s}%,description.ilike.%${s}%,emotional_engine.ilike.%${s}%`);
   }
 
-  const response = await query.order('date', { ascending: false });
+  const response = await query;
   
   if (response.error) {
     console.error("fetchPoems Error:", response.error.message, response.error.hint);
     throw new Error(`Supabase Error [${response.error.code}]: ${response.error.message}`);
   }
   
-  return (response.data || []) as Poem[];
+  const poems = (response.data || []) as Poem[];
+  return sortPoems(poems);
 };
 
 export const fetchPoemById = async (id: string): Promise<Poem | null> => {
@@ -81,22 +102,22 @@ export const fetchThemes = async (): Promise<string[]> => {
     }
   });
   
-  return Array.from(themeMap.values()).sort((a, b) => a.localeCompare(b));
+  return Array.from(themeMap.values()).sort((a, b) => a.compareLocale(b));
 };
 
 export const fetchFeaturedPoems = async (): Promise<Poem[]> => {
   const response = await supabase
     .from('poems')
     .select('*')
-    .eq('featured', true)
-    .order('date', { ascending: false });
+    .eq('featured', true);
 
   if (response.error) {
     console.error("fetchFeaturedPoems Error:", response.error.message);
     throw new Error(`Supabase Error [${response.error.code}]: ${response.error.message}`);
   }
   
-  return (response.data || []) as Poem[];
+  const poems = (response.data || []) as Poem[];
+  return sortPoems(poems);
 };
 
 export const fetchArchiveStats = async () => {
