@@ -180,6 +180,16 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem, allPoems }: 
     return poem.theme ? poem.theme.split(/[|,]+/).map(t => t.trim()).filter(Boolean) : [];
   }, [poem.theme]);
 
+  const averageRating = useMemo(() => {
+    if (reviews.length === 0) return 0;
+    const sum = reviews.reduce((acc, review) => acc + review.rating, 0);
+    return (sum / reviews.length).toFixed(1);
+  }, [reviews]);
+
+  const textReviews = useMemo(() => {
+    return reviews.filter(r => r.comment && r.comment.trim().length > 0);
+  }, [reviews]);
+
   useEffect(() => {
     const loadReviews = async () => {
       setLoadingReviews(true);
@@ -197,10 +207,10 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem, allPoems }: 
 
   const handleReviewSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newReview.name || !newReview.comment || newReview.rating === 0) {
+    if (!newReview.name || newReview.rating === 0) {
       toast({
         title: "Information required",
-        description: "Please provide your name, a rating, and your impression."
+        description: "Please provide your name and a rating."
       });
       return;
     }
@@ -209,7 +219,9 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem, allPoems }: 
     try {
       await addReview({
         poem_id: poem.id,
-        ...newReview
+        name: newReview.name,
+        rating: newReview.rating,
+        comment: newReview.comment.trim() || null
       });
       
       const updatedReviews = await fetchReviews(poem.id);
@@ -518,6 +530,20 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem, allPoems }: 
                 <h2 className="text-[10px] md:text-sm uppercase tracking-[0.3em] font-medium">Public Impressions</h2>
               </div>
               <p className="text-[10px] md:text-xs text-muted-foreground font-light">Share your own resonance with these words.</p>
+              {reviews.length > 0 && (
+                <div className="flex items-center justify-center gap-2 mt-4">
+                  <div className="flex gap-0.5">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star 
+                        key={star} 
+                        className={`w-3.5 h-3.5 ${star <= Number(averageRating) ? 'text-primary fill-primary' : 'text-muted-foreground/20'}`} 
+                      />
+                    ))}
+                  </div>
+                  <span className="text-xs font-headline text-primary/80">{averageRating} / 5</span>
+                  <span className="text-[10px] text-muted-foreground uppercase tracking-widest ml-1">({reviews.length})</span>
+                </div>
+              )}
             </header>
 
             <Card className="bg-card/20 border-border/40 rounded-2xl md:rounded-3xl overflow-hidden">
@@ -534,7 +560,7 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem, allPoems }: 
                       />
                     </div>
                     <div className="space-y-3">
-                      <label className="text-[9px] md:text-[10px] uppercase tracking-widest text-muted-foreground ml-1">Rating</label>
+                      <label className="text-[9px] md:text-[10px] uppercase tracking-widest text-muted-foreground ml-1">Rating <span className="text-primary">*</span></label>
                       <div className="flex gap-2">
                         {[1, 2, 3, 4, 5].map((star) => (
                           <button
@@ -554,7 +580,10 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem, allPoems }: 
                     </div>
                   </div>
                   <div className="space-y-3">
-                    <label className="text-[9px] md:text-[10px] uppercase tracking-widest text-muted-foreground ml-1">Impression</label>
+                    <div className="flex justify-between items-center px-1">
+                      <label className="text-[9px] md:text-[10px] uppercase tracking-widest text-muted-foreground">Impression (Optional)</label>
+                      <span className="text-[8px] uppercase tracking-widest text-muted-foreground/40 italic">You may leave this blank</span>
+                    </div>
                     <Textarea 
                       placeholder=""
                       value={newReview.comment}
@@ -564,29 +593,29 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem, allPoems }: 
                   </div>
                   <Button 
                     type="submit" 
-                    disabled={submittingReview}
+                    disabled={submittingReview || !newReview.name || newReview.rating === 0}
                     className="w-full md:w-auto rounded-full px-8 py-5 md:py-6 bg-primary text-primary-foreground hover:bg-primary/90 group h-auto"
                   >
                     {submittingReview ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Send className="w-4 h-4 mr-2" />}
-                    Leave Impression
+                    {newReview.comment.trim() ? 'Leave Impression' : 'Save Rating'}
                   </Button>
                 </form>
               </CardContent>
             </Card>
 
             <div className="space-y-6 md:space-y-8">
-              {reviews.length > 0 && (
-                <h3 className="text-lg md:text-xl font-headline text-center mb-6 md:mb-8">Impressions</h3>
+              {textReviews.length > 0 && (
+                <h3 className="text-lg md:text-xl font-headline text-center mb-6 md:mb-8 italic text-primary/60">Written Reflections</h3>
               )}
               
               {loadingReviews ? (
                 <div className="flex justify-center py-10 md:py-12">
                   <Loader2 className="w-5 h-5 md:w-6 md:h-6 text-primary animate-spin" />
                 </div>
-              ) : reviews.length > 0 ? (
+              ) : textReviews.length > 0 ? (
                 <div className="grid gap-4 md:gap-6">
                   <AnimatePresence mode="popLayout">
-                    {reviews.map((review, idx) => (
+                    {textReviews.map((review, idx) => (
                       <motion.div
                         key={review.id}
                         initial={{ opacity: 0, y: 10 }}
@@ -619,6 +648,12 @@ export function PoemClient({ initialPoem: poem, prevPoem, nextPoem, allPoems }: 
                       </motion.div>
                     ))}
                   </AnimatePresence>
+                </div>
+              ) : reviews.length > 0 ? (
+                <div className="text-center py-10 md:py-12 border border-dashed border-border/30 rounded-2xl">
+                  <p className="text-[10px] md:text-xs text-muted-foreground font-light tracking-widest italic px-6">
+                    Visitors have shared their ratings above, but the silence here awaits a written impression.
+                  </p>
                 </div>
               ) : (
                 <div className="text-center py-10 md:py-12 border border-dashed border-border/30 rounded-2xl">

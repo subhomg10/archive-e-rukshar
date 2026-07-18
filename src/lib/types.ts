@@ -22,6 +22,6 @@ export interface Review {
   poem_id: string;
   name: string;
   rating: number;
-  comment: string;
+  comment?: string | null;
   created_at: string;
 }
